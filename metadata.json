@@ -1,0 +1,8 @@
+{
+  "name": "NexusCampus: Modern Student Hub",
+  "description": "A professional, real-time campus operations and community platform for university students featuring queries, shared orders, and campus support.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}

@@ -1,0 +1,226 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    // Fields: uid (string), email (string), displayName (string), photoURL (string), universitySuffix (string), createdAt (number), role (string)
+    //
+    // Collection: queries
+    // Fields: id (string), authorUid (string), authorName (string), authorPhoto (string), content (string), imageUrl (string), upvotes (list), downvotes (list), status (string), createdAt (number)
+    //
+    // Collection: blinkit_requests
+    // Fields: id (string), authorUid (string), authorName (string), authorPhoto (string), itemDescription (string), windowMinutes (number), expiresAt (number), joinedUids (list), status (string), createdAt (number)
+    //
+    // Collection: buddy_posts
+    // Fields: id (string), authorUid (string), authorName (string), authorPhoto (string), category (string), title (string), description (string), createdAt (number)
+    //
+    // Collection: notifications
+    // Fields: id (string), recipientUid (string), title (string), message (string), type (string), read (bool), createdAt (number)
+    //
+    // Collection: messages
+    // Fields: id (string), senderUid (string), recipientUid (string), content (string), createdAt (number), read (bool)
+    //
+    // Collection: chat_sessions
+    // Fields: id (string), participants (list), lastMessage (string), lastMessageAt (number), updatedAt (number)
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.authorUid;
+    }
+
+    function isRecipient() {
+      return isAuthenticated() && request.auth.uid == resource.data.recipientUid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "yashpal.2024@nst.rishihood.edu.in" && request.auth.token.email_verified == true));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'universitySuffix', 'createdAt', 'role', 'subscriptions', 'blockedUids', 'bio', 'phone', 'privacySettings']) &&
+             data.uid == request.auth.uid &&
+             data.email is string &&
+             data.displayName is string &&
+             data.displayName.size() > 0 &&
+             data.displayName.size() < 100 &&
+             data.universitySuffix is string &&
+             data.createdAt is number &&
+             (!('role' in data) || data.role in ['admin', 'student']) &&
+             (data.get('photoURL', null) == null || (data.photoURL is string && data.photoURL.size() < 500)) &&
+             (!('subscriptions' in data) || data.subscriptions is map) &&
+             (!('blockedUids' in data) || data.blockedUids is list) &&
+             (!('bio' in data) || (data.bio is string && data.bio.size() < 500)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() < 20)) &&
+             (!('privacySettings' in data) || data.privacySettings is map);
+    }
+
+    function isValidQuery(data) {
+      return hasOnlyAllowedFields(['id', 'authorUid', 'authorName', 'authorPhoto', 'content', 'imageUrl', 'upvotes', 'downvotes', 'status', 'createdAt', 'replies']) &&
+             data.authorUid is string &&
+             data.authorName is string &&
+             data.authorName.size() < 100 &&
+             data.content is string &&
+             data.content.size() > 0 &&
+             data.content.size() < 2000 &&
+             data.upvotes is list &&
+             data.downvotes is list &&
+             data.status in ['pending', 'resolved', 'archived'] &&
+             data.createdAt is number &&
+             (data.get('authorPhoto', null) == null || (data.authorPhoto is string && data.authorPhoto.size() < 500)) &&
+             (data.get('imageUrl', null) == null || (data.imageUrl is string && data.imageUrl.size() < 500)) &&
+             (!('replies' in data) || data.replies is list);
+    }
+
+    function isValidBlinkit(data) {
+      return hasOnlyAllowedFields(['id', 'authorUid', 'authorName', 'authorPhoto', 'itemDescription', 'windowMinutes', 'expiresAt', 'joinedUids', 'status', 'createdAt', 'participants', 'messages']) &&
+             data.authorUid is string &&
+             data.authorName is string &&
+             data.authorName.size() < 100 &&
+             data.itemDescription is string &&
+             data.itemDescription.size() > 0 &&
+             data.itemDescription.size() < 500 &&
+             data.windowMinutes is number &&
+             data.expiresAt is number &&
+             data.joinedUids is list &&
+             data.joinedUids.size() < 50 &&
+             data.status in ['active', 'expired', 'completed'] &&
+             data.createdAt is number &&
+             (data.get('authorPhoto', null) == null || (data.authorPhoto is string && data.authorPhoto.size() < 500)) &&
+             (!('participants' in data) || data.participants is list) &&
+             (!('messages' in data) || data.messages is list);
+    }
+
+    function isValidBuddy(data) {
+      return hasOnlyAllowedFields(['id', 'authorUid', 'authorName', 'authorPhoto', 'category', 'title', 'description', 'createdAt', 'status', 'allowDMs']) &&
+             data.authorUid == request.auth.uid &&
+             data.authorName is string &&
+             data.authorName.size() < 100 &&
+             data.category in ['gym', 'swimming', 'coffee', 'cab', 'vacation', 'other'] &&
+             data.title is string &&
+             data.title.size() > 0 &&
+             data.title.size() < 200 &&
+             data.description is string &&
+             data.description.size() > 0 &&
+             data.description.size() < 1000 &&
+             data.createdAt is number &&
+             data.status in ['open', 'closed'] &&
+             data.allowDMs is bool &&
+             (data.get('authorPhoto', null) == null || (data.authorPhoto is string && data.authorPhoto.size() < 500));
+    }
+
+    function isValidMessage(data) {
+      return hasOnlyAllowedFields(['id', 'senderUid', 'recipientUid', 'content', 'createdAt', 'read']) &&
+             data.senderUid == request.auth.uid &&
+             data.recipientUid is string &&
+             data.content is string &&
+             data.content.size() > 0 &&
+             data.content.size() < 1000 &&
+             data.createdAt is number &&
+             data.read is bool;
+    }
+
+    function isValidChatSession(data) {
+      return hasOnlyAllowedFields(['id', 'participants', 'lastMessage', 'lastMessageAt', 'updatedAt']) &&
+             data.participants is list &&
+             data.participants.size() == 2 &&
+             request.auth.uid in data.participants &&
+             data.updatedAt is number &&
+             (!('lastMessage' in data) || (data.lastMessage is string && data.lastMessage.size() < 500)) &&
+             (!('lastMessageAt' in data) || data.lastMessageAt is number);
+    }
+
+    function isValidNotification(data) {
+      return hasOnlyAllowedFields(['id', 'recipientUid', 'senderUid', 'senderName', 'senderPhoto', 'title', 'message', 'type', 'read', 'createdAt']) &&
+             data.recipientUid is string &&
+             data.title is string &&
+             data.title.size() < 200 &&
+             data.message is string &&
+             data.message.size() < 1000 &&
+             data.type in ['query', 'blinkit', 'buddy', 'system', 'upvote', 'reply', 'subscription'] &&
+             data.read is bool &&
+             data.createdAt is number &&
+             (data.get('senderUid', null) == null || data.senderUid is string) &&
+             (data.get('senderName', null) == null || data.senderName is string) &&
+             (data.get('senderPhoto', null) == null || data.senderPhoto is string);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && (!('role' in request.resource.data) || request.resource.data.role == 'student' || isAdmin());
+      allow update: if (isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == resource.data.role || isAdmin())) || isAdmin();
+    }
+
+    match /queries/{queryId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidQuery(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        (isDocOwner() && isValidQuery(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'downvotes', 'replies'])) ||
+        isAdmin()
+      );
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /blinkit_requests/{requestId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidBlinkit(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        (isDocOwner() && isValidBlinkit(request.resource.data)) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['joinedUids', 'participants', 'messages'])) ||
+        isAdmin()
+      );
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /buddy_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidBuddy(request.resource.data);
+      allow update: if (isDocOwner() && isValidBuddy(request.resource.data)) || isAdmin();
+      allow delete: if isDocOwner() || isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isRecipient() || isAdmin();
+      allow create: if isAuthenticated() && isValidNotification(request.resource.data);
+      allow update: if isRecipient() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isRecipient() || isAdmin();
+    }
+
+
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.senderUid || request.auth.uid == resource.data.recipientUid || isAdmin());
+      allow create: if isAuthenticated() && isValidMessage(request.resource.data);
+      allow update: if isAuthenticated() && (request.auth.uid == resource.data.recipientUid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']));
+    }
+
+    match /chat_sessions/{sessionId} {
+      allow read: if isAuthenticated() && (request.auth.uid in resource.data.participants || isAdmin());
+      allow create: if isAuthenticated() && isValidChatSession(request.resource.data);
+      allow update: if isAuthenticated() && (request.auth.uid in resource.data.participants || isAdmin());
+    }
+  }
+}
+

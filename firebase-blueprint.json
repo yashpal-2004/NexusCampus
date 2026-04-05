@@ -1,0 +1,143 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "universitySuffix": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "role": { "type": "string", "enum": ["admin", "student"] }
+      },
+      "required": ["uid", "email", "displayName", "universitySuffix", "createdAt"]
+    },
+    "StudentQuery": {
+      "title": "StudentQuery",
+      "description": "A query posted by a student",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhoto": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "upvotes": { "type": "array", "items": { "type": "string" } },
+        "downvotes": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "resolved", "archived"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "authorUid", "authorName", "content", "upvotes", "downvotes", "status", "createdAt"]
+    },
+    "BlinkitRequest": {
+      "title": "BlinkitRequest",
+      "description": "A shared order request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhoto": { "type": "string" },
+        "itemDescription": { "type": "string" },
+        "windowMinutes": { "type": "number" },
+        "expiresAt": { "type": "number" },
+        "joinedUids": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["active", "expired", "completed"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "authorUid", "authorName", "itemDescription", "windowMinutes", "expiresAt", "joinedUids", "status", "createdAt"]
+    },
+    "BuddyPost": {
+      "title": "BuddyPost",
+      "description": "A post to find a buddy",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhoto": { "type": "string" },
+        "category": { "type": "string", "enum": ["gym", "swimming", "coffee", "cab", "vacation", "other"] },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "authorUid", "authorName", "category", "title", "description", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification for a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "recipientUid": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["query", "blinkit", "buddy", "system"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "recipientUid", "title", "message", "type", "read", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A direct message between users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "recipientUid": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["id", "senderUid", "recipientUid", "content", "createdAt", "read"]
+    },
+    "ChatSession": {
+      "title": "ChatSession",
+      "description": "A chat session between two users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["id", "participants", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/queries/{queryId}": {
+      "schema": "StudentQuery",
+      "description": "Student queries"
+    },
+    "/blinkit_requests/{requestId}": {
+      "schema": "BlinkitRequest",
+      "description": "Blinkit shared order requests"
+    },
+    "/buddy_posts/{postId}": {
+      "schema": "BuddyPost",
+      "description": "Buddy finding posts"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Direct messages"
+    },
+    "/chat_sessions/{sessionId}": {
+      "schema": "ChatSession",
+      "description": "Chat sessions"
+    }
+  }
+}
