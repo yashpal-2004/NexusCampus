@@ -13,9 +13,10 @@ import { motion } from 'motion/react';
 interface LoginProps {
   onLogin: () => void;
   isLoading: boolean;
+  error?: string | null;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, isLoading, error }) => {
   const features = [
     { icon: Zap, title: 'Real-time Updates', desc: 'Get instant notifications for campus events.' },
     { icon: ShieldCheck, title: 'Verified Network', desc: 'Exclusive access for university students only.' },
@@ -93,6 +94,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, isLoading }) => {
               <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-3 italic">Welcome Back.</h2>
               <p className="text-slate-500 font-medium">Sign in with your university credentials to access the hub.</p>
             </div>
+
+            {error && (
+              <div className="p-4 rounded-3xl bg-red-50 border border-red-100 text-red-600 text-xs font-medium">
+                <strong>Login Error:</strong> {error}
+              </div>
+            )}
 
             <div className="space-y-4">
               <button

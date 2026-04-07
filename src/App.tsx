@@ -84,6 +84,8 @@ const AppContent: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   
@@ -241,10 +243,15 @@ const AppContent: React.FC = () => {
   }, [user, blinkitRequests]);
 
   const handleLogin = async () => {
+    setLoginError(null);
+    setIsLoginLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed", error);
+      setLoginError(error.message || "An unknown error occurred during login.");
+    } finally {
+      setIsLoginLoading(false);
     }
   };
 
@@ -755,7 +762,7 @@ const AppContent: React.FC = () => {
   };
 
   if (loading) return <Loading />;
-  if (!user) return <Login onLogin={handleLogin} isLoading={false} />;
+  if (!user) return <Login onLogin={handleLogin} isLoading={isLoginLoading} error={loginError} />;
   if (isNewUser) return <Welcome onGetStarted={() => setIsNewUser(false)} userName={user.displayName} />;
 
   const renderContent = () => {
