@@ -36,7 +36,7 @@ const Laundry: React.FC = () => {
           
           <div className="flex items-center space-x-2 text-slate-400">
             <Sparkles className="w-4 h-4" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em]">UniVerse Digital Laundry</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em]">NexusCampus Digital Laundry</span>
           </div>
         </div>
 

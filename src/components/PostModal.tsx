@@ -161,7 +161,7 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onPostQuery, onP
             <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
               <div className="flex items-center space-x-2 text-slate-300">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Posting to UniVerse</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Posting to NexusCampus</span>
               </div>
               <button
                 onClick={handleSubmit}

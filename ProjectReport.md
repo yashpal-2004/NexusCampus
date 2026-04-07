@@ -1,7 +1,7 @@
-# Project Report: UniVerse Student Network
+# Project Report: NexusCampus Student Network
 
 ## 1. Problem Statement
-University students often face challenges in campus communication, finding partners for activities, coordinating shared orders (like Blinkit), and accessing quick medical or administrative support. Existing solutions are fragmented (WhatsApp groups, manual registers). UniVerse aims to centralize these needs into a modern, real-time platform.
+University students often face challenges in campus communication, finding partners for activities, coordinating shared orders (like Blinkit), and accessing quick medical or administrative support. Existing solutions are fragmented (WhatsApp groups, manual registers). NexusCampus aims to centralize these needs into a modern, real-time platform.
 
 ## 2. System Design Optimization
 - **Scalability:** Leveraged Firebase's NoSQL architecture to handle high-frequency read/write operations for the live feed.

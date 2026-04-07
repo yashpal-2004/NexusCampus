@@ -37,7 +37,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onGetStarted, userName }) => {
           </div>
           <h1 className="text-6xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] mb-6 italic">
             WELCOME TO <br />
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent uppercase">UNIVERSE</span>
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent uppercase">NexusCampus</span>
           </h1>
           <p className="text-2xl text-slate-500 font-medium tracking-tight">
             Hey {userName.split(' ')[0]}, your campus life just got an upgrade.
@@ -70,7 +70,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onGetStarted, userName }) => {
           className="group relative inline-flex items-center space-x-4 px-12 py-6 rounded-[32px] bg-slate-900 text-white font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-slate-900/20"
         >
           <Zap className="w-6 h-6 fill-white" />
-          <span>ENTER THE UNIVERSE</span>
+          <span>ENTER THE NexusCampus</span>
           <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
         </motion.button>
 

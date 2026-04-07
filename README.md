@@ -1,6 +1,6 @@
-# UniVerse: The Ultimate Student Network
+# NexusCampus: The Ultimate Student Network
 
-UniVerse is a modern, high-energy community platform designed specifically for university students. It combines real-time social interactions, shared ordering, buddy finding, and campus support into a single, high-performance web application.
+NexusCampus is a modern, high-energy community platform designed specifically for university students. It combines real-time social interactions, shared ordering, buddy finding, and campus support into a single, high-performance web application.
 
 ## 🚀 Tech Stack
 
@@ -15,7 +15,7 @@ UniVerse is a modern, high-energy community platform designed specifically for u
 1. **Clone the repository:**
    ```bash
    git clone <repository-url>
-   cd universe
+   cd NexusCampus
    ```
 
 2. **Install dependencies:**
@@ -37,7 +37,7 @@ UniVerse is a modern, high-energy community platform designed specifically for u
 
 ## 🏗️ Architecture Explanation
 
-UniVerse follows a **Serverless Full-Stack Architecture**:
+NexusCampus follows a **Serverless Full-Stack Architecture**:
 - **Client-Side:** React handles the UI and state management. Real-time listeners (`onSnapshot`) ensure the UI stays in sync with the database without manual refreshes.
 - **Backend-as-a-Service (BaaS):** Firebase Firestore acts as the real-time NoSQL database. Firebase Auth handles secure Google-based authentication.
 - **Security:** Firestore Security Rules enforce data integrity and ownership at the database level.
