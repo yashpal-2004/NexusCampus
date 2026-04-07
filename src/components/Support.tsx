@@ -15,7 +15,7 @@ import { cn } from '../lib/utils';
 
 const Support: React.FC = () => {
   const contacts = [
-    { role: 'Warden Office', name: 'Dr. Rajesh Kumar', phone: '+91 98765 43210', email: 'warden@univ.edu', icon: Shield },
+    { role: 'Warden Office', name: 'Mr. Mohit Sherawat', phone: '+91 98765 43210', email: 'warden@univ.edu', icon: Shield },
     { role: 'IT Support', name: 'Campus Tech Desk', phone: '+91 11223 34455', email: 'it.support@univ.edu', icon: LifeBuoy },
     { role: 'Counseling', name: 'Student Wellness', phone: '+91 55667 78899', email: 'wellness@univ.edu', icon: HelpCircle },
   ];
