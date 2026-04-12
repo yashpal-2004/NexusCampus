@@ -45,6 +45,7 @@ NexusCampus follows a **Serverless Full-Stack Architecture**:
 
 ## 👥 Team Members
 
-- **Lead Developer:** [Your Name]
-- **UI/UX Designer:** [Your Name]
-- **System Architect:** [Your Name]
+- **Yashpal** (2401010517) - Project Initialization, Firebase Configuration, and Frontend Development (Login, Support, and Core Components)
+- **Vaishnavi Dhanai** (2401010489) - System Architecture Diagrams and Repository Management
+- **Udit Jain** (2401010482) - Documentation and Project Support
+- **Shobhit** (2401020065) - Quality Assurance and Testing
