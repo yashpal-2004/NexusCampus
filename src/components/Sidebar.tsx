@@ -14,7 +14,8 @@ import {
   Shield,
   X,
   MessageCircle,
-  Hexagon
+  Hexagon,
+  Activity
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -34,16 +35,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user, sessio
   
   const menuItems = [
     { id: 'home', icon: Home, label: 'Home' },
-    { id: 'my-queries', icon: MessageSquare, label: 'My Queries' },
+    { id: 'my-activity', icon: Activity, label: 'My Activity' },
     ...(sessions.filter(s => s.participants.includes(user?.uid)).length > 0 
       ? [{ id: 'messages', icon: MessageCircle, label: 'Messages' }] 
       : []),
     { id: 'find-buddy', icon: Users, label: 'Find a Buddy' },
-    { id: 'medical', icon: Stethoscope, label: 'Medical' },
-    { id: 'support', icon: LifeBuoy, label: 'Support' },
+    { id: 'wellness', icon: Activity, label: 'Wellness' },
     { id: 'laundry', icon: Shirt, label: 'Laundry' },
     { id: 'food-court', icon: Utensils, label: 'Food Court' },
-    { id: 'notifications', icon: Bell, label: 'Notifications' },
     { id: 'profile', icon: User, label: 'Profile' },
     ...(isAdmin ? [{ id: 'admin', icon: Shield, label: 'Admin Panel' }] : []),
   ];

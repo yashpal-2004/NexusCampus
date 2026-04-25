@@ -96,6 +96,8 @@ export interface BlinkitRequest {
   status: 'active' | 'expired' | 'completed';
   createdAt: number;
   messages?: BlinkitMessage[];
+  type?: 'blinkit' | 'buddy';
+  closedAt?: number;
 }
 
 export interface BuddyPost {
@@ -107,8 +109,18 @@ export interface BuddyPost {
   title: string;
   description: string;
   createdAt: number;
-  status: 'open' | 'closed';
+  universitySuffix: string;
+  windowMinutes: number;
+  expiresAt: number;
+  status: 'active' | 'expired' | 'completed';
   allowDMs: boolean;
+  location?: string;
+  date?: string;
+  joinedUids?: string[];
+  participants?: BlinkitParticipant[];
+  messages?: BlinkitMessage[];
+  type?: 'buddy' | 'blinkit';
+  closedAt?: number;
 }
 
 export interface Notification {

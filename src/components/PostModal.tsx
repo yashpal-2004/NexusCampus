@@ -96,13 +96,19 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onPostQuery, onP
             <div className="p-8">
               {activeTab === 'query' ? (
                 <div className="space-y-6">
-                  <textarea
-                    autoFocus
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="What's on your mind, student?"
-                    className="w-full bg-transparent text-slate-900 text-xl font-medium placeholder:text-slate-300 border-none focus:ring-0 resize-none min-h-[150px] outline-none"
-                  />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                      <span>What's on your mind?</span>
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                      autoFocus
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder="Share your thoughts with the campus..."
+                      className="w-full bg-transparent text-slate-900 text-xl font-medium placeholder:text-slate-300 border-none focus:ring-0 resize-none min-h-[150px] outline-none"
+                    />
+                  </div>
                   
                   <div className="flex items-center space-x-4">
                     <div className="flex-1 relative">
@@ -120,7 +126,10 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onPostQuery, onP
               ) : (
                 <div className="space-y-8">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">What are you ordering?</label>
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                      <span>What are you ordering?</span>
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
                     <input 
                       autoFocus
                       type="text"

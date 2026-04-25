@@ -19,8 +19,10 @@ interface AdminPanelProps {
   queries: StudentQuery[];
   blinkitRequests: BlinkitRequest[];
   users: UserProfile[];
+  buddyPosts: any[];
   onDeleteQuery: (id: string) => void;
   onDeleteBlinkit: (id: string) => void;
+  onDeleteBuddy: (id: string) => void;
   onResolveQuery: (id: string) => void;
   onDeleteUser: (uid: string) => void;
 }
@@ -29,15 +31,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   queries, 
   blinkitRequests, 
   users,
+  buddyPosts,
   onDeleteQuery, 
   onDeleteBlinkit,
+  onDeleteBuddy,
   onResolveQuery,
   onDeleteUser
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'queries' | 'blinkit' | 'users'>('queries');
+  const [activeTab, setActiveTab] = useState<'queries' | 'blinkit' | 'users' | 'buddy'>('queries');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +110,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           {[
             { id: 'queries', icon: MessageSquare, label: 'Queries' },
             { id: 'blinkit', icon: ShoppingBag, label: 'Blinkit' },
+            { id: 'buddy', icon: Users, label: 'Buddies' },
             { id: 'users', icon: Users, label: 'Users' },
           ].map((tab) => (
             <button
@@ -212,6 +217,47 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   </button>
                 </div>
               ))}
+            </motion.div>
+          )}
+
+          {activeTab === 'buddy' && (
+            <motion.div
+              key="buddy"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-4"
+            >
+              {buddyPosts.map((post) => (
+                <div key={post.id} className="bg-white border border-slate-200 rounded-[32px] p-6 flex items-center justify-between group hover:shadow-md transition-all">
+                  <div className="flex items-center space-x-4 min-w-0">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 flex-shrink-0">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-sm font-bold text-slate-900">{post.authorName}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600 text-[8px] font-black uppercase tracking-widest">
+                          {post.category || 'Buddy'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 truncate max-w-md">{post.title}</p>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={() => onDeleteBuddy(post.id)}
+                    className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+              {buddyPosts.length === 0 && (
+                <div className="text-center py-20 bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No buddy requests found</p>
+                </div>
+              )}
             </motion.div>
           )}
 

@@ -9,10 +9,18 @@ import {
   LogOut,
   ChevronRight,
   Check,
-  UserX,
-  ShieldOff
+  ShieldOff,
+  Bell,
+  Trash2,
+  CheckCircle2,
+  MessageSquare,
+  ShoppingBag,
+  Users as UsersIcon,
+  Sparkles,
+  UserX
 } from 'lucide-react';
-import { UserProfile } from '../types';
+import { Notification, UserProfile } from '../types';
+import { formatDistanceToNow } from 'date-fns';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -22,10 +30,24 @@ interface ProfileProps {
   onUpdateProfile: (updates: Partial<UserProfile>) => void;
   onUnblockUser: (uid: string) => void;
   onLogout: () => void;
+  notifications: Notification[];
+  onMarkAsRead: (id: string) => void;
+  onClearAll: () => void;
+  initialSection?: 'general' | 'notifications' | 'security' | 'blocked';
 }
 
-const Profile: React.FC<ProfileProps> = ({ profile, allUsers, onUpdateProfile, onUnblockUser, onLogout }) => {
-  const [activeSection, setActiveSection] = useState<'general' | 'preferences' | 'security' | 'blocked'>('general');
+const Profile: React.FC<ProfileProps> = ({ 
+  profile, 
+  allUsers, 
+  onUpdateProfile, 
+  onUnblockUser, 
+  onLogout,
+  notifications,
+  onMarkAsRead,
+  onClearAll,
+  initialSection = 'general'
+}) => {
+  const [activeSection, setActiveSection] = useState<'general' | 'notifications' | 'security' | 'blocked'>(initialSection);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     bio: profile.bio || '',
@@ -190,47 +212,145 @@ const Profile: React.FC<ProfileProps> = ({ profile, allUsers, onUpdateProfile, o
               </motion.div>
             )}
 
-            {activeSection === 'preferences' && (
+            {activeSection === 'notifications' && (
               <motion.div
-                key="preferences"
+                key="notifications"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="bg-white border border-slate-200 rounded-[40px] p-8 space-y-6 shadow-sm"
+                className="space-y-6"
               >
-                <h3 className="text-xl font-black text-slate-900 tracking-tight italic">Notification Preferences</h3>
-                <p className="text-sm text-slate-500">Choose which campus updates you want to receive notifications for.</p>
-                
-                <div className="space-y-4">
-                  {[
-                    { key: 'gym', label: 'Gym Updates', desc: 'Crowd alerts and slot availability' },
-                    { key: 'foodCourt', label: 'Food Court', desc: 'New menus and special offers' },
-                    { key: 'laundry', label: 'Laundry', desc: 'Machine availability and status' },
-                    { key: 'system', label: 'System Alerts', desc: 'Important campus announcements' },
-                    { key: 'queries', label: 'New Queries', desc: 'Get notified when someone asks a new query' },
-                    { key: 'replies', label: 'Query Replies', desc: 'Get notified when someone replies to your query' },
-                    { key: 'blinkit', label: 'Blinkit Requests', desc: 'New shared order opportunities' },
-                    { key: 'buddy', label: 'Buddy Finder', desc: 'New buddy requests and matches' },
-                  ].map((sub) => (
-                    <div key={sub.key} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                      <div className="min-w-0 flex-1 mr-4">
-                        <p className="text-sm font-black text-slate-900 truncate">{sub.label}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{sub.desc}</p>
+                {/* Notification Alerts List */}
+                <div className="bg-white border border-slate-200 rounded-[40px] p-8 space-y-6 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 px-3 rounded-xl bg-orange-50 text-orange-600">
+                        <Bell className="w-5 h-5" />
                       </div>
-                      <button 
-                        onClick={() => updateSubscription(sub.key as keyof NonNullable<UserProfile['subscriptions']>)}
-                        className={cn(
-                          "w-12 h-6 rounded-full transition-all relative flex-shrink-0",
-                          profile.subscriptions?.[sub.key as keyof NonNullable<UserProfile['subscriptions']>] ? "bg-orange-600" : "bg-slate-200"
-                        )}
-                      >
-                        <motion.div 
-                          animate={{ x: profile.subscriptions?.[sub.key as keyof NonNullable<UserProfile['subscriptions']>] ? 24 : 4 }}
-                          className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
-                        />
-                      </button>
+                      <h3 className="text-xl font-black text-slate-900 tracking-tight italic">Recent Alerts</h3>
                     </div>
-                  ))}
+                    {notifications.length > 0 && (
+                      <button 
+                        onClick={onClearAll}
+                        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all text-[10px] font-black uppercase tracking-widest"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Clear All</span>
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 no-scrollbar">
+                    {notifications.length === 0 ? (
+                      <div className="py-20 text-center space-y-4 opacity-20 bg-slate-50 rounded-[32px] border border-dashed border-slate-200">
+                        <Bell className="w-16 h-16 mx-auto text-slate-400" />
+                        <p className="text-sm font-bold uppercase tracking-widest text-slate-400">No notifications yet</p>
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={cn(
+                            "p-6 rounded-[32px] border transition-all flex items-start space-x-5",
+                            notif.read 
+                              ? "bg-slate-50 border-slate-100 opacity-60" 
+                              : "bg-white border-slate-200 shadow-xl shadow-slate-200/10"
+                          )}
+                        >
+                          <div className={cn(
+                            "p-4 rounded-2xl flex-shrink-0 shadow-sm",
+                            notif.type === 'query' ? 'text-blue-600 bg-blue-50' :
+                            notif.type === 'blinkit' ? 'text-yellow-600 bg-yellow-50' :
+                            notif.type === 'buddy' ? 'text-orange-600 bg-orange-50' :
+                            notif.type === 'upvote' ? 'text-pink-600 bg-pink-50' :
+                            notif.type === 'reply' ? 'text-indigo-600 bg-indigo-50' :
+                            'text-slate-600 bg-slate-50'
+                          )}>
+                            {notif.type === 'query' && <MessageSquare className="w-5 h-5" />}
+                            {notif.type === 'blinkit' && <ShoppingBag className="w-5 h-5" />}
+                            {notif.type === 'buddy' && <UsersIcon className="w-5 h-5" />}
+                            {notif.type === 'upvote' && <Sparkles className="w-5 h-5" />}
+                            {notif.type === 'reply' && <MessageSquare className="w-5 h-5" />}
+                            {notif.type === 'system' && <Shield className="w-5 h-5" />}
+                            {notif.type === 'subscription' && <Settings className="w-5 h-5" />}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <h4 className={cn(
+                                "font-black text-base tracking-tight",
+                                notif.read ? "text-slate-400" : "text-slate-900"
+                              )}>
+                                {notif.title}
+                              </h4>
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                {formatDistanceToNow(notif.createdAt)} ago
+                              </span>
+                            </div>
+                            <p className={cn(
+                              "text-sm leading-relaxed mb-3",
+                              notif.read ? "text-slate-400" : "text-slate-600"
+                            )}>
+                              {notif.message}
+                            </p>
+                            
+                            {!notif.read && (
+                              <button 
+                                onClick={() => onMarkAsRead(notif.id)}
+                                className="flex items-center space-x-2 text-[10px] font-black text-orange-600 hover:text-orange-700 transition-colors uppercase tracking-widest"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>Mark as read</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Subscriptions */}
+                <div className="bg-white border border-slate-200 rounded-[40px] p-8 space-y-6 shadow-sm">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="p-2 px-3 rounded-xl bg-orange-50 text-orange-600">
+                      <Settings className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight italic">Preferences</h3>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-4">Channel Subscriptions</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { key: 'gym', label: 'Gym Updates', desc: 'Crowds & Slots' },
+                      { key: 'foodCourt', label: 'Food Court', desc: 'Menu & Offers' },
+                      { key: 'laundry', label: 'Laundry', desc: 'Availability' },
+                      { key: 'system', label: 'System Alerts', desc: 'Admin Updates' },
+                      { key: 'queries', label: 'New Queries', desc: 'Campus Feed' },
+                      { key: 'replies', label: 'Query Replies', desc: 'Direct Interactions' },
+                      { key: 'blinkit', label: 'Blinkit Req', desc: 'Shared Orders' },
+                      { key: 'buddy', label: 'Buddy Finder', desc: 'Matches' },
+                    ].map((sub) => (
+                      <div key={sub.key} className="flex items-center justify-between p-5 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-slate-200 transition-all group">
+                        <div className="min-w-0">
+                          <p className="text-sm font-black text-slate-900 truncate">{sub.label}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{sub.desc}</p>
+                        </div>
+                        <button 
+                          onClick={() => updateSubscription(sub.key as keyof NonNullable<UserProfile['subscriptions']>)}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-all duration-300 relative flex-shrink-0 shadow-inner",
+                            profile.subscriptions?.[sub.key as keyof NonNullable<UserProfile['subscriptions']>] ? "bg-orange-600" : "bg-slate-200"
+                          )}
+                        >
+                          <motion.div 
+                            animate={{ x: profile.subscriptions?.[sub.key as keyof NonNullable<UserProfile['subscriptions']>] ? 24 : 4 }}
+                            className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-md"
+                          />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -366,19 +486,19 @@ const Profile: React.FC<ProfileProps> = ({ profile, allUsers, onUpdateProfile, o
               </button>
 
               <button 
-                onClick={() => setActiveSection('preferences')}
+                onClick={() => setActiveSection('notifications')}
                 className={cn(
                   "w-full flex items-center justify-between p-4 rounded-2xl border transition-all group",
-                  activeSection === 'preferences' 
+                  activeSection === 'notifications' 
                     ? "bg-orange-600 border-orange-600 text-white" 
                     : "bg-slate-50 border-slate-100 text-slate-600 hover:bg-slate-100"
                 )}
               >
                 <div className="flex items-center space-x-3">
-                  <Settings className={cn("w-4 h-4", activeSection === 'preferences' ? "text-white" : "text-slate-400")} />
-                  <span className="text-sm font-black truncate">Preferences</span>
+                  <Bell className={cn("w-4 h-4", activeSection === 'notifications' ? "text-white" : "text-slate-400")} />
+                  <span className="text-sm font-black truncate">Notifications</span>
                 </div>
-                <ChevronRight className={cn("w-4 h-4", activeSection === 'preferences' ? "text-white/50" : "text-slate-300")} />
+                <ChevronRight className={cn("w-4 h-4", activeSection === 'notifications' ? "text-white/50" : "text-slate-300")} />
               </button>
 
               <button 

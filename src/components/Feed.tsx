@@ -16,10 +16,9 @@ interface FeedProps {
   onCloseBlinkit?: (id: string) => void;
   onDeleteBlinkit?: (id: string) => void;
   onExtendBlinkit?: (id: string, mins: number) => void;
-  onSendBlinkitMessage?: (id: string, content: string) => void;
-  onRemoveBlinkitParticipant?: (requestId: string, participantUid: string) => void;
   onBlockBlinkitParticipant?: (participantUid: string) => void;
   onOpenPostModal: () => void;
+  onDeleteQuery: (id: string) => void;
   currentUserId?: string;
 }
 
@@ -37,20 +36,30 @@ const Feed: React.FC<FeedProps> = ({
   onRemoveBlinkitParticipant,
   onBlockBlinkitParticipant,
   onOpenPostModal,
+  onDeleteQuery,
   currentUserId 
 }) => {
+  const [currentTime, setCurrentTime] = React.useState(Date.now());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Combine and sort by createdAt
   const allItems = [
     ...queries.map(q => ({ ...q, type: 'query' as const })),
-    ...blinkitRequests.map(b => ({ ...b, type: 'blinkit' as const }))
+    ...blinkitRequests.filter(b => {
+      const bExp = Number(b.expiresAt) || 0;
+      return b.status === 'active' && bExp > currentTime;
+    }).map(b => ({ ...b, type: 'blinkit' as const }))
   ].sort((a, b) => ensureMillis(b.createdAt) - ensureMillis(a.createdAt));
 
   return (
     <div className="max-w-2xl mx-auto pt-8 pb-24 px-4 relative">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center space-x-2">
-          <Sparkles className="w-8 h-8 text-orange-500" />
-          <span>For You</span>
+        <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">
+          Campus Catch-up
         </h2>
       </div>
 
@@ -69,6 +78,7 @@ const Feed: React.FC<FeedProps> = ({
                 query={item as StudentQuery} 
                 onUpvote={onUpvote} 
                 onReply={onReply}
+                onDelete={onDeleteQuery}
                 currentUserId={currentUserId}
               />
             ) : (

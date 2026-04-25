@@ -91,7 +91,7 @@ service cloud.firestore {
     }
 
     function isValidBlinkit(data) {
-      return hasOnlyAllowedFields(['id', 'authorUid', 'authorName', 'authorPhoto', 'itemDescription', 'windowMinutes', 'expiresAt', 'joinedUids', 'status', 'createdAt', 'participants', 'messages']) &&
+      return hasOnlyAllowedFields(['id', 'authorUid', 'authorName', 'authorPhoto', 'itemDescription', 'windowMinutes', 'expiresAt', 'joinedUids', 'status', 'createdAt', 'participants', 'messages', 'closedAt']) &&
              data.authorUid is string &&
              data.authorName is string &&
              data.authorName.size() < 100 &&
@@ -106,7 +106,8 @@ service cloud.firestore {
              data.createdAt is number &&
              (data.get('authorPhoto', null) == null || (data.authorPhoto is string && data.authorPhoto.size() < 500)) &&
              (!('participants' in data) || data.participants is list) &&
-             (!('messages' in data) || data.messages is list);
+             (!('messages' in data) || data.messages is list) &&
+             (!('closedAt' in data) || data.closedAt is number);
     }
 
     function isValidBuddy(data) {
@@ -189,7 +190,7 @@ service cloud.firestore {
       allow create: if isAuthenticated() && isValidBlinkit(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
       allow update: if isAuthenticated() && (
         (isDocOwner() && isValidBlinkit(request.resource.data)) ||
-        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['joinedUids', 'participants', 'messages'])) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['joinedUids', 'participants', 'messages', 'status', 'closedAt'])) ||
         isAdmin()
       );
       allow delete: if isDocOwner() || isAdmin();

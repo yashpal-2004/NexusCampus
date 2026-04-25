@@ -5,7 +5,8 @@ import {
   MoreHorizontal,
   CheckCircle2,
   Clock,
-  Send
+  Send,
+  Trash2
 } from 'lucide-react';
 import { StudentQuery, QueryReply } from '../types';
 import { cn, ensureMillis } from '../lib/utils';
@@ -16,6 +17,7 @@ interface QueryCardProps {
   query: StudentQuery;
   onUpvote: (id: string) => void;
   onReply: (id: string, content: string) => void;
+  onDelete?: (id: string) => void;
   currentUserId?: string;
 }
 
@@ -67,9 +69,18 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, current
                 </span>
               )}
             </div>
-            <button className="text-slate-300 hover:text-slate-600 transition-colors">
-              <MoreHorizontal className="w-5 h-5" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={() => onDelete?.(query.id)}
+                className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                title="Delete Query"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+              <button className="text-slate-300 hover:text-slate-600 transition-colors">
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           
           <p className="text-slate-700 text-sm leading-relaxed mb-4 whitespace-pre-wrap">

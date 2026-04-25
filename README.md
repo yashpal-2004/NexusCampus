@@ -48,4 +48,4 @@ NexusCampus follows a **Serverless Full-Stack Architecture**:
 - **Yashpal** (2401010517) - Project Initialization, Core Logic, and Frontend Migration (App Layout, Campus Services, AdminPanel)
 - **Vaishnavi Dhanai** (2401010489) - Component Synchronization (Profile, Support, Notifications) and Firebase Configuration Management
 - **Udit Jain** (2401010482) - UI/UX Development (Sidebar, Feed, Notifications, Responsive Layout) and Documentation
-- **Shobhit** (2401020065) - Feature Integration (User Connectivity, Login Flow, Query Component) and Asset Management (Brand Logo, Gemini API)
+- **Shobhit** (2401020065) - Feature Integration (User Connectivity, Login Flow, Query Component) and Asset Management (Brand Logo, Groq API)

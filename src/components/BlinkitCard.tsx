@@ -29,6 +29,7 @@ interface BlinkitCardProps {
   onRemoveParticipant?: (requestId: string, participantUid: string) => void;
   onBlockParticipant?: (participantUid: string) => void;
   currentUserId?: string;
+  showExtend?: boolean;
 }
 
 const BlinkitCard: React.FC<BlinkitCardProps> = ({ 
@@ -41,7 +42,8 @@ const BlinkitCard: React.FC<BlinkitCardProps> = ({
   onSendMessage,
   onRemoveParticipant,
   onBlockParticipant,
-  currentUserId 
+  currentUserId,
+  showExtend = false
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isMessaging, setIsMessaging] = useState(false);
@@ -54,7 +56,38 @@ const BlinkitCard: React.FC<BlinkitCardProps> = ({
   const isExpired = timeLeft <= 0 || request.status === 'expired';
   const isCreator = currentUserId === request.authorUid;
   const canSeeParticipants = !isExpired || isCreator || isJoined;
-  const canMessage = isJoined || isCreator;
+  const canMessage = (isJoined || isCreator) && !isExpired;
+  
+  const [graceTimeLeft, setGraceTimeLeft] = useState<number | null>(null);
+
+  // Only allow extension for 1 minute after expiration or closure
+  const canExtend = isCreator && isExpired && showExtend && (
+    (request.closedAt ? (Date.now() - ensureMillis(request.closedAt) < 60000) : (Date.now() - ensureMillis(request.expiresAt) < 60000))
+  );
+
+  useEffect(() => {
+    if (isExpired && isCreator) {
+      const updateGrace = () => {
+        const now = Date.now();
+        const baseTime = request.closedAt ? ensureMillis(request.closedAt) : ensureMillis(request.expiresAt);
+        const elapsed = now - baseTime;
+        
+        // Only show if we are within 60s AFTER baseTime
+        const remaining = Math.max(0, 60 - Math.floor(elapsed / 1000));
+        
+        if (remaining <= 0 || elapsed < -1000) { // small buffer for minor sync issues
+          setGraceTimeLeft(null);
+        } else {
+          setGraceTimeLeft(remaining);
+        }
+      };
+      updateGrace();
+      const interval = setInterval(updateGrace, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setGraceTimeLeft(null);
+    }
+  }, [isExpired, isCreator, request.expiresAt]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -83,10 +116,11 @@ const BlinkitCard: React.FC<BlinkitCardProps> = ({
       className={cn(
         "relative overflow-hidden rounded-3xl p-6 mb-4 border transition-all duration-500 shadow-sm",
         isExpired 
-          ? "bg-slate-50 border-slate-200 opacity-60" 
+          ? "bg-slate-50 border-slate-200 opacity-70" 
           : "bg-white border-slate-100 hover:border-orange-200"
       )}
     >
+      <div className={cn("group-hover:grayscale-0 transition-all duration-500", isExpired && "grayscale")}>
       {/* Progress Bar Background */}
       {!isExpired && (
         <div className="absolute top-0 left-0 w-full h-1 bg-slate-100">
@@ -268,87 +302,72 @@ const BlinkitCard: React.FC<BlinkitCardProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Users className="w-4 h-4 text-slate-400" />
-          <span className="text-xs font-bold text-slate-500">
-            {request.joinedUids.length} joined
-          </span>
-        </div>
+        <div className="flex items-center justify-between">
+          <div className={cn("flex items-center space-x-2 transition-all", isExpired && "grayscale")}>
+            <Users className="w-4 h-4 text-slate-400" />
+            <span className="text-xs font-bold text-slate-500">
+              {request.joinedUids.length} joined
+            </span>
+          </div>
 
-        <div className="flex items-center space-x-2">
-          {isCreator && isExpired && (
-            <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
-              <input 
-                type="number" 
-                value={extendMins}
-                onChange={(e) => setExtendMins(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-12 bg-transparent text-center text-xs font-bold text-slate-900 outline-none"
-                min="1"
-              />
-              <span className="text-[10px] font-bold text-slate-400 pr-1">MINS</span>
+          <div className="flex items-center space-x-2">
+            {canExtend && (
+              <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-2xl border border-slate-200 grayscale hover:grayscale-0 transition-all duration-300">
+                <input 
+                  type="number" 
+                  value={extendMins}
+                  onChange={(e) => setExtendMins(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-10 bg-transparent text-center text-xs font-bold text-slate-900 outline-none"
+                />
+                <button
+                  onClick={() => onExtend?.(request.id, extendMins)}
+                  className="flex items-center space-x-2 px-3 py-1.5 rounded-xl font-bold text-[10px] bg-slate-900 text-white hover:bg-slate-800 transition-all"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>EXTEND {graceTimeLeft !== null && `(${graceTimeLeft}s)`}</span>
+                </button>
+              </div>
+            )}
+            
+            {(!isJoined || isCreator) && (
               <button
-                onClick={() => onExtend?.(request.id, extendMins)}
-                className="flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-xs bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+                disabled={isExpired || isJoined || isJoining || isCreator}
+                onClick={async () => {
+                  if (isCreator) return;
+                  setIsJoining(true);
+                  try {
+                    await onJoin(request.id);
+                  } finally {
+                    setIsJoining(false);
+                  }
+                }}
+                className={cn(
+                  "flex items-center space-x-2 px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300",
+                  (isJoined || isCreator)
+                    ? "bg-green-50 text-green-600 border border-green-200" 
+                    : isExpired
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                      : "bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20"
+                )}
               >
-                <Plus className="w-3 h-3" />
-                <span>EXTEND</span>
+                {isJoining ? (
+                  <span className="animate-pulse">JOINING...</span>
+                ) : (isJoined || isCreator) ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{isCreator ? "YOUR ORDER" : "JOINED"}</span>
+                  </>
+                ) : isExpired ? (
+                  <span>CLOSED</span>
+                ) : (
+                  <>
+                    <span>JOIN NOW</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
-            </div>
-          )}
-          
-          {isJoined && !isCreator && (
-            <button
-              disabled={isLeaving}
-              onClick={async () => {
-                setIsLeaving(true);
-                try {
-                  await onLeave?.(request.id);
-                } finally {
-                  setIsLeaving(false);
-                }
-              }}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl font-bold text-xs bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all"
-            >
-              {isLeaving ? "REVOKING..." : "REVOKE JOIN"}
-            </button>
-          )}
-
-          <button
-            disabled={isExpired || isJoined || isJoining}
-            onClick={async () => {
-              setIsJoining(true);
-              try {
-                await onJoin(request.id);
-              } finally {
-                setIsJoining(false);
-              }
-            }}
-            className={cn(
-              "flex items-center space-x-2 px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300",
-              isJoined 
-                ? "bg-green-50 text-green-600 border border-green-200" 
-                : isExpired
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  : "bg-orange-500 text-white hover:bg-orange-600 hover:scale-105 active:scale-95 shadow-lg shadow-orange-500/20"
             )}
-          >
-            {isJoining ? (
-              <span className="animate-pulse">JOINING...</span>
-            ) : isJoined ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                <span>JOINED</span>
-              </>
-            ) : isExpired ? (
-              <span>CLOSED</span>
-            ) : (
-              <>
-                <span>JOIN NOW</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
+          </div>
         </div>
       </div>
     </motion.div>

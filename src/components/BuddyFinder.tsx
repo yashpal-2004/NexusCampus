@@ -8,37 +8,87 @@ import {
   Plus, 
   Search, 
   MessageCircle, 
-  MapPin 
+  MapPin,
+  Calendar,
+  Timer,
+  CheckCircle2,
+  Trash2,
+  ChevronRight,
+  Clock
 } from 'lucide-react';
-import { BuddyPost } from '../types';
-import { cn } from '../lib/utils';
+import { BuddyPost, UserProfile } from '../types';
+import { cn, ensureMillis } from '../lib/utils';
+import BuddyCard from './BuddyCard';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface BuddyFinderProps {
   posts: BuddyPost[];
-  onPostBuddy: (category: BuddyPost['category'], title: string, description: string, allowDMs: boolean) => void;
-  onConnect: (post: BuddyPost) => void;
+  onPostBuddy: (category: BuddyPost['category'], title: string, description: string, window: number, allowDMs: boolean, location: string, date: string) => void;
+  onConnect: (id: string) => void;
+  onLeaveBuddy: (id: string) => void;
+  onSendMessage: (id: string, content: string) => void;
   onDeleteBuddy: (id: string) => void;
+  onExtendBuddy: (id: string, mins: number) => void;
   onCloseBuddy: (id: string) => void;
   onUpdateBuddy: (id: string, updates: Partial<BuddyPost>) => void;
   currentUserId?: string;
+  allUsers: UserProfile[];
 }
+
+import { format } from 'date-fns';
 
 const BuddyFinder: React.FC<BuddyFinderProps> = ({ 
   posts, 
   onPostBuddy, 
-  onConnect, 
+  onConnect,
+  onLeaveBuddy,
+  onSendMessage,
   onDeleteBuddy,
+  onExtendBuddy,
   onCloseBuddy,
   onUpdateBuddy,
-  currentUserId 
+  currentUserId,
+  allUsers
 }) => {
   const [activeCategory, setActiveCategory] = useState<BuddyPost['category'] | 'all'>('all');
   const [isPosting, setIsPosting] = useState(false);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [messageContent, setMessageContent] = useState('');
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newCat, setNewCat] = useState<BuddyPost['category']>('gym');
+  const [newLocation, setNewLocation] = useState('');
+  const [newDate, setNewDate] = useState(format(new Date(), "d MMM"));
+  const [newWindow, setNewWindow] = useState(15);
   const [allowDMs, setAllowDMs] = useState(true);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  React.useEffect(() => {
+    const category = categories.find(c => c.id === newCat);
+    if (category && category.id !== 'all') {
+      const defaultTitle = `Buddy for ${category.label}`;
+      const defaultDesc = `Looking for someone to join me for ${category.label.toLowerCase()}! Let's connect.`;
+      
+      // Only set if current values are empty or previously set defaults
+      if (!newTitle || newTitle.startsWith('Buddy for ')) {
+        setNewTitle(defaultTitle);
+      }
+      if (!newDesc || (newDesc.startsWith('Looking for someone to join me for ') && newDesc.endsWith("! Let's connect."))) {
+        setNewDesc(defaultDesc);
+      }
+      // Set location default if empty or matches a category label
+      const isCurrentlyCategory = categories.some(c => c.label === newLocation);
+      if (!newLocation || isCurrentlyCategory) {
+        setNewLocation(category.label);
+      }
+    }
+  }, [newCat, isPosting]);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const categories = [
     { id: 'all', icon: Users, label: 'All' },
@@ -50,17 +100,30 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
     { id: 'other', icon: Users, label: 'Other' },
   ];
 
-  const filteredPosts = activeCategory === 'all' 
-    ? posts 
-    : posts.filter(p => p.category === activeCategory);
+  const filteredPosts = posts.filter(p => {
+    const isCatMatch = activeCategory === 'all' || p.category === activeCategory;
+    const isStatusActive = p.status === 'active';
+    const isNotExpired = ensureMillis(p.expiresAt) > currentTime;
+    return isCatMatch && isStatusActive && isNotExpired;
+  });
 
-  const handleSubmit = () => {
-    if (newTitle.trim() && newDesc.trim()) {
-      onPostBuddy(newCat, newTitle, newDesc, allowDMs);
-      setIsPosting(false);
-      setNewTitle('');
-      setNewDesc('');
-      setAllowDMs(true);
+  const handleSubmit = async () => {
+    if (newTitle.trim() && newDesc.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        await onPostBuddy(newCat, newTitle, newDesc, newWindow, allowDMs, newLocation, newDate);
+        setIsPosting(false);
+        setNewTitle('');
+        setNewDesc('');
+        setNewLocation('');
+        setNewDate(format(new Date(), "d MMM"));
+        setNewWindow(15);
+        setAllowDMs(true);
+      } catch (error) {
+        console.error("Submission failed:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -100,84 +163,35 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AnimatePresence mode="popLayout">
-          {filteredPosts.map((post) => (
-            <motion.div
-              key={post.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className={cn(
-                "bg-white border border-slate-200 rounded-[32px] p-6 hover:shadow-xl transition-all group relative",
-                post.status === 'closed' && "opacity-60 grayscale"
-              )}
+        <AnimatePresence>
+          {filteredPosts.length > 0 ? filteredPosts.map((post) => {
+            return (
+              <BuddyCard
+                key={post.id}
+                post={post}
+                onConnect={onConnect}
+                onLeave={onLeaveBuddy}
+                onClose={onCloseBuddy}
+                onDelete={onDeleteBuddy}
+                onExtend={onExtendBuddy}
+                onSendMessage={onSendMessage}
+                currentUserId={currentUserId}
+                allUsers={allUsers}
+              />
+            );
+          }) : (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[40px] text-center"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-orange-50 text-orange-600">
-                  {(() => {
-                    const CategoryIcon = categories.find(c => c.id === post.category)?.icon || Users;
-                    return <CategoryIcon className="w-6 h-6" />;
-                  })()}
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                    {post.category}
-                  </span>
-                  {post.status === 'closed' && (
-                    <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest mt-1">
-                      CLOSED
-                    </span>
-                  )}
-                </div>
+              <div className="p-6 rounded-full bg-slate-100 text-slate-300 mb-4">
+                <Users className="w-12 h-12" />
               </div>
-              
-              <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{post.title}</h3>
-              <p className="text-slate-500 text-sm mb-6 line-clamp-3 leading-relaxed">
-                {post.description}
-              </p>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-[10px] font-bold text-white">
-                    {post.authorName[0]}
-                  </div>
-                  <span className="text-xs font-bold text-slate-600">{post.authorName}</span>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  {currentUserId === post.authorUid ? (
-                    <div className="flex items-center space-x-2">
-                      {post.status === 'open' && (
-                        <button 
-                          onClick={() => onCloseBuddy(post.id)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold hover:bg-slate-200 transition-all"
-                        >
-                          CLOSE
-                        </button>
-                      )}
-                      <button 
-                        onClick={() => onDeleteBuddy(post.id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-[10px] font-bold hover:bg-red-100 transition-all"
-                      >
-                        DELETE
-                      </button>
-                    </div>
-                  ) : (
-                    post.status === 'open' && (
-                      <button 
-                        onClick={() => onConnect(post)}
-                        className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/10"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        <span>CONNECT</span>
-                      </button>
-                    )
-                  )}
-                </div>
-              </div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No buddy requests found</p>
+              <p className="text-slate-300 text-[10px] mt-2">Try posting one or switching categories!</p>
             </motion.div>
-          ))}
+          )}
         </AnimatePresence>
       </div>
 
@@ -223,7 +237,10 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Title</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                    <span>Title</span>
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
                   <input 
                     type="text"
                     value={newTitle}
@@ -233,14 +250,69 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                   />
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                      <MapPin className="w-3 h-3 mr-2" />
+                      <span>Location</span>
+                    </label>
+                    <input 
+                      type="text"
+                      value={newLocation}
+                      onChange={(e) => setNewLocation(e.target.value)}
+                      placeholder="e.g. Gym A"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none text-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                      <Calendar className="w-3 h-3 mr-2" />
+                      <span>Date</span>
+                    </label>
+                    <input 
+                      type="text"
+                      value={newDate}
+                      onChange={(e) => setNewDate(e.target.value)}
+                      placeholder="e.g. 5 PM Today"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none text-sm"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Description</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
+                    <span>Description</span>
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
                   <textarea 
                     value={newDesc}
                     onChange={(e) => setNewDesc(e.target.value)}
                     placeholder="Tell them more about what you're looking for..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors min-h-[120px] resize-none outline-none"
                   />
+                </div>
+
+                <div className="space-y-4">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
+                    <Clock className="w-3 h-3" />
+                    <span>How long is this valid?</span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-3">
+                    {[15, 30, 45, 60].map((min) => (
+                      <button
+                        key={min}
+                        onClick={() => setNewWindow(min)}
+                        className={cn(
+                          "py-3 rounded-2xl text-xs font-black transition-all",
+                          newWindow === min 
+                            ? "bg-orange-500 text-white shadow-xl shadow-orange-500/20 scale-105" 
+                            : "bg-slate-50 text-slate-400 border border-slate-100 hover:bg-slate-100"
+                        )}
+                      >
+                        {min}m
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -271,9 +343,15 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                   </button>
                   <button 
                     onClick={handleSubmit}
-                    className="flex-1 py-4 rounded-2xl bg-orange-500 text-white font-bold text-sm hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+                    disabled={!newTitle.trim() || !newDesc.trim() || isSubmitting}
+                    className={cn(
+                      "flex-1 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center",
+                      (!newTitle.trim() || !newDesc.trim() || isSubmitting)
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20"
+                    )}
                   >
-                    POST NOW
+                    {isSubmitting ? <span className="animate-pulse">POSTING...</span> : "POST NOW"}
                   </button>
                 </div>
               </div>
