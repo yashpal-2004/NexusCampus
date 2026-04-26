@@ -1,10 +1,10 @@
 import React from 'react';
-import { StudentQuery, BlinkitRequest } from '../types';
+import { StudentQuery, BlinkitRequest } from '../../types';
 import QueryCard from './QueryCard';
 import BlinkitCard from './BlinkitCard';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Sparkles } from 'lucide-react';
-import { ensureMillis } from '../lib/utils';
+import { ensureMillis } from '../../lib/utils';
 
 interface FeedProps {
   queries: StudentQuery[];
@@ -16,6 +16,8 @@ interface FeedProps {
   onCloseBlinkit?: (id: string) => void;
   onDeleteBlinkit?: (id: string) => void;
   onExtendBlinkit?: (id: string, mins: number) => void;
+  onSendBlinkitMessage?: (id: string, content: string) => void;
+  onRemoveBlinkitParticipant?: (requestId: string, participantUid: string) => void;
   onBlockBlinkitParticipant?: (participantUid: string) => void;
   onOpenPostModal: () => void;
   onDeleteQuery: (id: string) => void;
@@ -57,8 +59,8 @@ const Feed: React.FC<FeedProps> = ({
 
   return (
     <div className="max-w-2xl mx-auto pt-8 pb-24 px-4 relative">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">
+      <div className="flex items-center justify-between mb-10">
+        <h2 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
           Campus Catch-up
         </h2>
       </div>
@@ -78,7 +80,7 @@ const Feed: React.FC<FeedProps> = ({
                 query={item as StudentQuery} 
                 onUpvote={onUpvote} 
                 onReply={onReply}
-                onDelete={onDeleteQuery}
+                onDelete={(item.id.startsWith('mock_') || (item as StudentQuery).authorUid !== currentUserId) ? undefined : onDeleteQuery}
                 currentUserId={currentUserId}
               />
             ) : (

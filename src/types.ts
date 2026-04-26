@@ -1,5 +1,13 @@
 export type QueryStatus = 'pending' | 'resolved' | 'archived';
 
+export enum OperationType {
+  CREATE = 'CREATE',
+  READ = 'READ',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  LIST = 'LIST'
+}
+
 export interface UserProfile {
   uid: string;
   email: string;

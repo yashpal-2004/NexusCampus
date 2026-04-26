@@ -6,10 +6,14 @@ import {
   CheckCircle2,
   Clock,
   Send,
-  Trash2
+  Trash2,
+  Link2,
+  Flag,
+  Share2,
+  EyeOff
 } from 'lucide-react';
-import { StudentQuery, QueryReply } from '../types';
-import { cn, ensureMillis } from '../lib/utils';
+import { StudentQuery, QueryReply } from '../../types';
+import { cn, ensureMillis } from '../../lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -21,9 +25,12 @@ interface QueryCardProps {
   currentUserId?: string;
 }
 
-const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, currentUserId }) => {
+const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelete, currentUserId }) => {
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  
   const hasUpvoted = currentUserId && query.upvotes.includes(currentUserId);
   const voteCount = query.upvotes.length;
 
@@ -35,10 +42,13 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, current
     }
   };
 
+  if (isHidden) return null;
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9 }}
       className="bg-white border border-slate-200 rounded-3xl p-5 mb-4 hover:border-orange-200 transition-all group shadow-sm"
     >
       <div className="flex items-start space-x-4">
@@ -69,17 +79,57 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, current
                 </span>
               )}
             </div>
-            <div className="flex items-center space-x-2">
-              <button 
-                onClick={() => onDelete?.(query.id)}
-                className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                title="Delete Query"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <button className="text-slate-300 hover:text-slate-600 transition-colors">
-                <MoreHorizontal className="w-5 h-5" />
-              </button>
+            <div className="flex items-center space-x-2 relative">
+              {onDelete && (
+                <button 
+                  onClick={() => onDelete(query.id)}
+                  className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider hover:bg-red-100 transition-all border border-red-100"
+                  title="Delete Query"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+              )}
+              
+              <div className="relative group/menu">
+                <button 
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className={cn(
+                    "p-2 rounded-xl transition-all",
+                    isMenuOpen ? "bg-slate-100 text-slate-900" : "text-slate-300 hover:text-slate-600 hover:bg-slate-50"
+                  )}
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </button>
+
+                <AnimatePresence>
+                  {isMenuOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setIsMenuOpen(false)} 
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                        className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1"
+                      >
+                        <button 
+                          onClick={() => {
+                            setIsHidden(true);
+                            setIsMenuOpen(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[10px] font-black text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all uppercase tracking-[0.2em]"
+                        >
+                          <EyeOff className="w-4 h-4 text-orange-500" />
+                          <span>Hide for now</span>
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
           

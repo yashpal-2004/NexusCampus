@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Message, ChatSession, UserProfile } from '../types';
+import { Message, ChatSession, UserProfile } from '../../types';
 import { Send, User, MessageSquare, ChevronLeft } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -44,7 +44,7 @@ const Messaging: React.FC<MessagingProps> = ({ user, messages, sessions, onSendM
   };
 
   return (
-    <div className="max-w-6xl mx-auto h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-xl">
+    <div className="max-w-4xl mx-auto h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-xl">
       {/* Sessions List */}
       <div className={cn(
         "w-full md:w-80 border-r border-slate-100 flex flex-col transition-all duration-300",
@@ -133,7 +133,7 @@ const Messaging: React.FC<MessagingProps> = ({ user, messages, sessions, onSendM
                     <div className={cn(
                       "px-6 py-3 rounded-[24px] text-sm leading-relaxed shadow-sm",
                       msg.senderUid === user.uid 
-                        ? "bg-orange-500 text-white rounded-br-none" 
+                        ? "bg-orange-600 text-white rounded-br-none" 
                         : "bg-white border border-slate-100 text-slate-700 rounded-bl-none"
                     )}>
                       {msg.content}
@@ -159,7 +159,7 @@ const Messaging: React.FC<MessagingProps> = ({ user, messages, sessions, onSendM
                 />
                 <button 
                   onClick={handleSend}
-                  className="p-4 rounded-2xl bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+                  className="p-4 rounded-2xl bg-orange-600 text-white hover:bg-orange-700 transition-all shadow-lg shadow-orange-600/20"
                 >
                   <Send className="w-5 h-5" />
                 </button>

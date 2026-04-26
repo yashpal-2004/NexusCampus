@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { BuddyPost, UserProfile } from '../types';
+import { BuddyPost, UserProfile } from '../../types';
 import { Users, MessageCircle, MapPin, Calendar, Clock, Trash2, Shield, AlertCircle, Plus, User, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { formatDistanceToNow } from 'date-fns';
-import { ensureMillis } from '../lib/utils';
+import { ensureMillis } from '../../lib/utils';
 
 interface BuddyCardProps {
   post: BuddyPost;
@@ -285,9 +285,10 @@ const BuddyCard: React.FC<BuddyCardProps> = ({
               )}
               <button 
                 onClick={() => onDelete(post.id)}
-                className="px-5 py-2.5 rounded-2xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
+                className="flex items-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
               >
-                Delete
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete</span>
               </button>
             </div>
           ) : (

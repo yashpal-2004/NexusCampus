@@ -17,7 +17,7 @@ import {
   Hexagon,
   Activity
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SidebarProps {
@@ -36,11 +36,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user, sessio
   const menuItems = [
     { id: 'home', icon: Home, label: 'Home' },
     { id: 'my-activity', icon: Activity, label: 'My Activity' },
-    ...(sessions.filter(s => s.participants.includes(user?.uid)).length > 0 
+    ...(sessions.filter(s => s.participants?.includes(user?.uid)).length > 0 
       ? [{ id: 'messages', icon: MessageCircle, label: 'Messages' }] 
       : []),
     { id: 'find-buddy', icon: Users, label: 'Find a Buddy' },
     { id: 'wellness', icon: Activity, label: 'Wellness' },
+    { id: 'support', icon: LifeBuoy, label: 'Support' },
     { id: 'laundry', icon: Shirt, label: 'Laundry' },
     { id: 'food-court', icon: Utensils, label: 'Food Court' },
     { id: 'profile', icon: User, label: 'Profile' },
@@ -63,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user, sessio
       </AnimatePresence>
 
       <div className={cn(
-        "h-screen w-72 bg-white border-r border-slate-200 flex flex-col p-6 fixed left-0 top-0 z-50 transition-all duration-500 ease-out shadow-xl",
+        "h-screen w-64 bg-white border-r border-slate-200 flex flex-col p-6 fixed left-0 top-0 z-50 transition-all duration-500 ease-out shadow-xl",
         "lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
@@ -102,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user, sessio
               {activeTab === item.id && (
                 <motion.div 
                   layoutId="active-pill"
-                  className="absolute left-0 w-1 h-6 bg-orange-500 rounded-full"
+                  className="absolute left-0 w-1.5 h-8 bg-orange-500 rounded-r-full"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}

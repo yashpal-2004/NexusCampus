@@ -13,7 +13,7 @@ import {
   Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 const FoodCourt: React.FC = () => {
   const [selectedOutlet, setSelectedOutlet] = useState<any | null>(null);
@@ -25,7 +25,7 @@ const FoodCourt: React.FC = () => {
       waitTime: '5-10 min', 
       status: 'Open', 
       type: 'Cafe', 
-      image: '/chai.png',
+      image: '/mock/chai.png',
       menu: [
         { item: 'Masala Chai', price: '₹15', tags: ['Popular'] },
         { item: 'Cardamom Chai', price: '₹15', tags: [] },
@@ -41,7 +41,7 @@ const FoodCourt: React.FC = () => {
       waitTime: '2-5 min', 
       status: 'Open', 
       type: 'Convenience', 
-      image: '/tuck.png',
+      image: '/mock/tuck.png',
       menu: [
         { item: 'Veg Maggi', price: '₹25', tags: ['Popular'] },
         { item: 'Cheese Maggi', price: '₹40', tags: [] },
@@ -57,7 +57,7 @@ const FoodCourt: React.FC = () => {
       waitTime: '10-15 min', 
       status: 'Open', 
       type: 'Premium Cafe', 
-      image: '/ccd.png',
+      image: '/mock/ccd.png',
       menu: [
         { item: 'Cappuccino', price: '₹120', tags: ['Popular'] },
         { item: 'Cafe Latte', price: '₹130', tags: [] },
@@ -72,7 +72,7 @@ const FoodCourt: React.FC = () => {
       waitTime: 'varies', 
       status: 'Open', 
       type: 'Dining Hall', 
-      image: '/mess.png',
+      image: '/mock/mess.png',
       menu: [
         { item: 'Special Thali', price: '₹80', tags: ['Popular'] },
         { item: 'Rajma Chawal', price: '₹50', tags: ['Popular'] },
@@ -84,10 +84,10 @@ const FoodCourt: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto pt-8 pb-24 px-4">
+    <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Campus Food Court</h2>
+          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">Campus Food Court</h2>
           <p className="text-slate-500 text-sm font-medium flex items-center space-x-2">
             <MapPin className="w-4 h-4" />
             <span>Check real-time wait times and menus across campus.</span>
@@ -102,7 +102,7 @@ const FoodCourt: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="group relative bg-[#121212] border border-white/10 rounded-[40px] overflow-hidden hover:border-orange-500/30 transition-all flex flex-col"
+            className="group relative bg-white border border-slate-200 rounded-[40px] overflow-hidden hover:border-orange-500/30 transition-all flex flex-col shadow-sm"
           >
             <div className="aspect-[4/3] overflow-hidden relative">
               <img 
@@ -137,10 +137,10 @@ const FoodCourt: React.FC = () => {
             <div className="p-8 flex-1 flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-2xl font-black text-white tracking-tight">{outlet.name}</h3>
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest">{outlet.type}</p>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{outlet.name}</h3>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{outlet.type}</p>
                 </div>
-                <button className="p-3 rounded-2xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                <button className="p-3 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all">
                   <Info className="w-5 h-5" />
                 </button>
               </div>
@@ -158,7 +158,7 @@ const FoodCourt: React.FC = () => {
 
               <button 
                 onClick={() => setSelectedOutlet(outlet)}
-                className="w-full mt-auto py-4 rounded-2xl bg-white text-black font-black text-sm flex items-center justify-center space-x-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/5"
+                className="w-full mt-auto py-4 rounded-2xl bg-slate-900 text-white font-black text-sm flex items-center justify-center space-x-2 hover:bg-orange-600 transition-all shadow-xl shadow-slate-900/10"
               >
                 <span>VIEW FULL MENU</span>
                 <ChevronRight className="w-4 h-4" />

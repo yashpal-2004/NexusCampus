@@ -9,10 +9,13 @@ import {
   CheckCircle, 
   AlertCircle,
   ChevronRight,
-  Search
+  Search,
+  Sparkles,
+  Eye,
+  EyeOff
 } from 'lucide-react';
-import { StudentQuery, BlinkitRequest, UserProfile } from '../types';
-import { cn } from '../lib/utils';
+import { StudentQuery, BlinkitRequest, UserProfile } from '../../types';
+import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminPanelProps {
@@ -25,6 +28,7 @@ interface AdminPanelProps {
   onDeleteBuddy: (id: string) => void;
   onResolveQuery: (id: string) => void;
   onDeleteUser: (uid: string) => void;
+  onRestoreMocks: () => void;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ 
@@ -36,10 +40,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   onDeleteBlinkit,
   onDeleteBuddy,
   onResolveQuery,
-  onDeleteUser
+  onDeleteUser,
+  onRestoreMocks
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('admin123');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'queries' | 'blinkit' | 'users' | 'buddy'>('queries');
 
@@ -76,12 +82,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="relative">
                 <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                 <input 
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-14 pr-6 text-slate-900 placeholder:text-slate-300 focus:border-orange-500/50 transition-colors outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-14 pr-14 text-slate-900 placeholder:text-slate-300 focus:border-orange-500/50 transition-colors outline-none"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
               {error && <p className="text-red-500 text-[10px] font-bold ml-4 uppercase tracking-wider">{error}</p>}
             </div>
@@ -99,34 +112,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   }
 
   return (
-    <div className="max-w-6xl mx-auto pt-8 pb-24 px-4">
+    <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div>
           <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">Control Center</h2>
           <p className="text-slate-400 text-sm font-medium">Manage campus activity and maintain community standards.</p>
         </div>
         
-        <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
-          {[
-            { id: 'queries', icon: MessageSquare, label: 'Queries' },
-            { id: 'blinkit', icon: ShoppingBag, label: 'Blinkit' },
-            { id: 'buddy', icon: Users, label: 'Buddies' },
-            { id: 'users', icon: Users, label: 'Users' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={cn(
-                "flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all",
-                activeTab === tab.id 
-                  ? "bg-white text-slate-900 shadow-sm" 
-                  : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
-              )}
-            >
-              <tab.icon className="w-4 h-4" />
-              <span className="uppercase tracking-widest">{tab.label}</span>
-            </button>
-          ))}
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <button
+            onClick={onRestoreMocks}
+            className="flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-100 hover:bg-orange-100 transition-all shadow-sm"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Restore All Mocks</span>
+          </button>
+
+          <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+            {[
+              { id: 'queries', icon: MessageSquare, label: 'Queries' },
+              { id: 'blinkit', icon: ShoppingBag, label: 'Blinkit' },
+              { id: 'buddy', icon: Users, label: 'Buddies' },
+              { id: 'users', icon: Users, label: 'Users' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={cn(
+                  "flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all",
+                  activeTab === tab.id 
+                    ? "bg-white text-slate-900 shadow-sm" 
+                    : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
+                )}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span className="uppercase tracking-widest">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -171,9 +194,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     )}
                     <button 
                       onClick={() => onDeleteQuery(query.id)}
-                      className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                      className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4" />
+                      <span>Delete</span>
                     </button>
                   </div>
                 </div>
@@ -211,9 +235,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   
                   <button 
                     onClick={() => onDeleteBlinkit(req.id)}
-                    className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                    className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
                   </button>
                 </div>
               ))}
@@ -247,9 +272,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   
                   <button 
                     onClick={() => onDeleteBuddy(post.id)}
-                    className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                    className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
                   </button>
                 </div>
               ))}
@@ -288,9 +314,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   
                   <button 
                     onClick={() => onDeleteUser(u.uid)}
-                    className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                    className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
                   </button>
                 </div>
               ))}

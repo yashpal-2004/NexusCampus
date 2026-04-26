@@ -13,8 +13,8 @@ import {
   Send,
   Plus
 } from 'lucide-react';
-import { BlinkitRequest, BlinkitMessage } from '../types';
-import { cn, ensureMillis } from '../lib/utils';
+import { BlinkitRequest, BlinkitMessage } from '../../types';
+import { cn, ensureMillis } from '../../lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -160,10 +160,11 @@ const BlinkitCard: React.FC<BlinkitCardProps> = ({
           {isCreator && (
             <button 
               onClick={() => onDelete?.(request.id)}
-              className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all border border-slate-100"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider hover:bg-red-100 transition-all border border-red-100"
               title="Delete Request"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete</span>
             </button>
           )}
           <div className={cn(

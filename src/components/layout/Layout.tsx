@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Hexagon } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -48,7 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
       
       <main className={cn(
         "flex-1 min-h-screen relative overflow-x-hidden pt-16 lg:pt-0 transition-all duration-300",
-        "lg:ml-72"
+        "lg:ml-64"
       )}>
         {/* Background Decorative Elements */}
         <div className="fixed top-0 right-0 w-[60%] h-[60%] bg-orange-500/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
@@ -84,5 +85,4 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
   );
 };
 
-import { cn } from '../lib/utils';
 export default Layout;

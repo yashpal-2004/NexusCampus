@@ -16,8 +16,8 @@ import {
   ChevronRight,
   Clock
 } from 'lucide-react';
-import { BuddyPost, UserProfile } from '../types';
-import { cn, ensureMillis } from '../lib/utils';
+import { BuddyPost, UserProfile } from '../../types';
+import { cn, ensureMillis } from '../../lib/utils';
 import BuddyCard from './BuddyCard';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -107,6 +107,14 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
     return isCatMatch && isStatusActive && isNotExpired;
   });
 
+  const handleClose = async (id: string) => {
+    await onCloseBuddy(id);
+  };
+
+  const handleDelete = async (id: string) => {
+    await onDeleteBuddy(id);
+  };
+
   const handleSubmit = async () => {
     if (newTitle.trim() && newDesc.trim() && !isSubmitting) {
       setIsSubmitting(true);
@@ -131,7 +139,7 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
     <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">Find a Buddy</h2>
+          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">Find a Buddy</h2>
           <p className="text-slate-500 text-sm font-medium">Don't go alone. Find your partner for anything.</p>
         </div>
         <button 
@@ -171,8 +179,8 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                 post={post}
                 onConnect={onConnect}
                 onLeave={onLeaveBuddy}
-                onClose={onCloseBuddy}
-                onDelete={onDeleteBuddy}
+                onClose={handleClose}
+                onDelete={handleDelete}
                 onExtend={onExtendBuddy}
                 onSendMessage={onSendMessage}
                 currentUserId={currentUserId}
@@ -210,11 +218,20 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg bg-white border border-slate-200 rounded-[40px] p-8 shadow-2xl"
+              className="relative w-full max-w-lg bg-white border border-slate-200 rounded-[40px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
             >
-              <h3 className="text-2xl font-bold text-slate-900 mb-8 tracking-tighter">Find Your Buddy</h3>
-              
-              <div className="space-y-6">
+              <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tighter">Find Your Buddy</h3>
+                <button 
+                  onClick={() => setIsPosting(false)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+                >
+                  <Plus className="w-6 h-6 rotate-45" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+                <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Category</label>
                   <div className="grid grid-cols-3 gap-2">
@@ -333,11 +350,18 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                     )} />
                   </button>
                 </div>
+                  </div>
+                </div>
 
-                <div className="flex space-x-4 pt-4">
+              <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                 <div className="hidden sm:flex items-center space-x-2 text-slate-300">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-nowrap">NexusCampus Sync</span>
+                </div>
+                <div className="flex space-x-3 w-full sm:w-auto">
                   <button 
                     onClick={() => setIsPosting(false)}
-                    className="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-all"
+                    className="flex-1 sm:flex-none px-6 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
                   >
                     CANCEL
                   </button>
@@ -345,13 +369,13 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
                     onClick={handleSubmit}
                     disabled={!newTitle.trim() || !newDesc.trim() || isSubmitting}
                     className={cn(
-                      "flex-1 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center",
+                      "flex-1 sm:flex-none px-10 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center",
                       (!newTitle.trim() || !newDesc.trim() || isSubmitting)
                         ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                        : "bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20"
+                        : "bg-orange-500 text-white hover:bg-orange-600 shadow-xl shadow-orange-500/20"
                     )}
                   >
-                    {isSubmitting ? <span className="animate-pulse">POSTING...</span> : "POST NOW"}
+                    {isSubmitting ? <span className="animate-pulse px-2">POSTING...</span> : "POST NOW"}
                   </button>
                 </div>
               </div>

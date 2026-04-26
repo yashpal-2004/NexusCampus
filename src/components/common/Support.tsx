@@ -11,7 +11,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 const Support: React.FC = () => {
   const contacts = [
@@ -27,7 +27,7 @@ const Support: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto pt-8 pb-24 px-4">
+    <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
       <div className="mb-12">
         <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">Campus Support</h2>
         <p className="text-slate-500 text-sm font-medium">Everything you need to navigate campus life smoothly.</p>

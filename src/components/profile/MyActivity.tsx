@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { StudentQuery, BlinkitRequest, BuddyPost, UserProfile } from '../types';
-import QueryCard from './QueryCard';
-import BlinkitCard from './BlinkitCard';
-import BuddyCard from './BuddyCard';
+import { StudentQuery, BlinkitRequest, BuddyPost, UserProfile } from '../../types';
+import QueryCard from '../feed/QueryCard';
+import BlinkitCard from '../feed/BlinkitCard';
+import BuddyCard from '../social/BuddyCard';
 import { MessageSquare, CheckCircle, ShoppingBag, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 interface MyActivityProps {
   userQueries: StudentQuery[];
@@ -38,7 +38,7 @@ const MyActivity: React.FC<MyActivityProps> = ({
     <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
       <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 italic">My Activity</h2>
+          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">My Activity</h2>
           <p className="text-slate-500 text-sm font-medium">History of your campus contributions.</p>
         </div>
 
