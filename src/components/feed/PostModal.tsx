@@ -6,7 +6,7 @@ import {
   Image as ImageIcon, 
   Send, 
   Clock, 
-  Sparkles
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../lib/utils';
@@ -49,143 +49,158 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onPostQuery, onP
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="absolute inset-0 bg-ramos-black/90 backdrop-blur-xl"
           />
           
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.9, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-lg bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-2xl"
+            exit={{ opacity: 0, scale: 0.9, y: 40 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative w-full max-w-xl bg-white rounded-[48px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)]"
           >
-            {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex space-x-2">
+            {/* Header / Tab System */}
+            <div className="pt-10 px-10 pb-6 flex items-center justify-between border-b border-ramos-gray">
+              <div className="flex bg-ramos-gray p-1.5 rounded-[24px]">
                 <button
                   onClick={() => setActiveTab('query')}
                   className={cn(
-                    "flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all",
-                    activeTab === 'query' ? "bg-orange-500 text-white shadow-md shadow-orange-500/20" : "text-slate-400 hover:text-slate-600"
+                    "flex items-center space-x-3 px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em]",
+                    activeTab === 'query' ? "bg-white text-ramos-black shadow-xl shadow-ramos-black/5" : "text-ramos-black/20 hover:text-ramos-black"
                   )}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>QUERY</span>
+                  <span>Query</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('blinkit')}
                   className={cn(
-                    "flex items-center space-x-2 px-4 py-2 rounded-full text-xs font-bold transition-all",
-                    activeTab === 'blinkit' ? "bg-orange-500 text-white shadow-md shadow-orange-500/20" : "text-slate-400 hover:text-slate-600"
+                    "flex items-center space-x-3 px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em]",
+                    activeTab === 'blinkit' ? "bg-white text-ramos-black shadow-xl shadow-ramos-black/5" : "text-ramos-black/20 hover:text-ramos-black"
                   )}
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  <span>BLINKIT</span>
+                  <span>Shared Order</span>
                 </button>
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                className="p-3 rounded-2xl bg-ramos-gray text-ramos-black/20 hover:text-ramos-black hover:bg-ramos-gray/80 transition-all"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Content */}
-            <div className="p-8">
-              {activeTab === 'query' ? (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                      <span>What's on your mind?</span>
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <textarea
-                      autoFocus
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="Share your thoughts with the campus..."
-                      className="w-full bg-transparent text-slate-900 text-xl font-bold placeholder:text-slate-200 border-none focus:ring-0 resize-none min-h-[150px] outline-none"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1 relative">
-                      <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
+            {/* Content Body */}
+            <div className="p-12">
+              <AnimatePresence mode="wait">
+                {activeTab === 'query' ? (
+                  <motion.div 
+                    key="query-form"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-8"
+                  >
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] flex items-center space-x-2">
+                        <Zap className="w-3 h-3 text-ramos-red" />
+                        <span>Post a Query</span>
+                      </label>
+                      <textarea
+                        autoFocus
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="What's the current status on campus?"
+                        className="w-full bg-transparent text-ramos-black text-2xl font-bold tracking-tight placeholder:text-ramos-black/5 border-none focus:ring-0 resize-none min-h-[180px] outline-none"
+                      />
+                    </div>
+                    
+                    <div className="relative group">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-ramos-gray flex items-center justify-center border border-ramos-black/5">
+                        <ImageIcon className="w-4 h-4 text-ramos-black/40" />
+                      </div>
                       <input 
                         type="text"
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
-                        placeholder="Image URL (optional)"
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3 pl-12 pr-4 text-xs font-bold text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none"
+                        placeholder="Add image URL (optional)"
+                        className="w-full bg-ramos-gray border border-transparent rounded-[24px] py-5 pl-18 pr-6 text-sm font-bold text-ramos-black placeholder:text-ramos-black/20 focus:bg-white focus:border-ramos-red/20 transition-all outline-none"
                       />
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                      <span>What are you ordering?</span>
-                      <span className="text-red-500 ml-1">*</span>
-                    </label>
-                    <input 
-                      autoFocus
-                      type="text"
-                      value={blinkitItem}
-                      onChange={(e) => setBlinkitItem(e.target.value)}
-                      placeholder="e.g. 2 Pizzas from Dominos"
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-lg font-bold text-slate-900 placeholder:text-slate-200 focus:border-orange-500 transition-colors outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center space-x-2">
-                      <Clock className="w-3 h-3 text-orange-500" />
-                      <span>Order Window (Minutes)</span>
-                    </label>
-                    <div className="flex space-x-2">
-                      {[5, 10, 15, 20].map((min) => (
-                        <button
-                          key={min}
-                          onClick={() => setBlinkitWindow(min)}
-                          className={cn(
-                            "flex-1 py-3 rounded-2xl text-[10px] font-black transition-all border",
-                            blinkitWindow === min 
-                              ? "bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20" 
-                              : "bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100"
-                          )}
-                        >
-                          {min}m
-                        </button>
-                      ))}
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="blinkit-form"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-10"
+                  >
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] flex items-center space-x-2">
+                        <ShoppingBag className="w-3 h-3 text-ramos-red" />
+                        <span>Shared Order Details</span>
+                      </label>
+                      <input 
+                        autoFocus
+                        type="text"
+                        value={blinkitItem}
+                        onChange={(e) => setBlinkitItem(e.target.value)}
+                        placeholder="What are you ordering? (e.g. Pizza)"
+                        className="w-full bg-ramos-gray border border-transparent rounded-[24px] py-6 px-8 text-xl font-bold text-ramos-black placeholder:text-ramos-black/20 focus:bg-white focus:border-ramos-red/20 transition-all outline-none"
+                      />
                     </div>
-                  </div>
-                </div>
-              )}
+
+                    <div className="space-y-6">
+                      <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] flex items-center space-x-3">
+                        <Clock className="w-3 h-3 text-ramos-red" />
+                        <span>Order Window (Minutes)</span>
+                      </label>
+                      <div className="grid grid-cols-4 gap-4">
+                        {[5, 10, 15, 20].map((min) => (
+                          <button
+                            key={min}
+                            onClick={() => setBlinkitWindow(min)}
+                            className={cn(
+                              "py-5 rounded-[20px] text-[10px] font-black transition-all border uppercase tracking-widest",
+                              blinkitWindow === min 
+                                ? "bg-ramos-black text-white border-ramos-black shadow-2xl shadow-ramos-black/20" 
+                                : "bg-ramos-gray text-ramos-black/20 border-transparent hover:bg-ramos-gray/80 hover:text-ramos-black"
+                            )}
+                          >
+                            {min}m
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Footer */}
-            <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-slate-300">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">NexusCampus</span>
+            {/* Action Footer */}
+            <div className="p-10 bg-ramos-gray flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-ramos-red animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-black/20 italic">Nexus Protocol</span>
               </div>
               <button
                 onClick={handleSubmit}
                 disabled={activeTab === 'query' ? !content.trim() : !blinkitItem.trim()}
                 className={cn(
-                  "flex items-center space-x-2 px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl",
-                  "bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 shadow-orange-500/20"
+                  "flex items-center space-x-4 px-10 py-5 rounded-[24px] font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-2xl active:scale-95",
+                  "bg-ramos-red text-white hover:scale-105 disabled:opacity-20 shadow-ramos-red/30 border border-ramos-red/20"
                 )}
               >
-                <span>PUBLISH</span>
-                <Send className="w-4 h-4" />
+                <span>Publish Post</span>
+                <Send className="w-5 h-5" />
               </button>
             </div>
           </motion.div>

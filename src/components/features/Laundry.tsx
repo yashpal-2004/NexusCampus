@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Shirt, 
   Clock, 
-  Sparkles, 
   AlertCircle, 
   Zap, 
   Calendar, 
@@ -106,88 +105,93 @@ const Laundry: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto pt-8 pb-24 px-4 lg:px-8">
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-8 border-b border-slate-100 pb-8">
+    <div className="max-w-6xl mx-auto pt-12 pb-32 px-6 lg:px-8">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-10">
         <div>
-          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-4 italic leading-none truncate">Campus Laundry</h2>
-          <div className="flex flex-wrap gap-4">
-            <p className="text-slate-500 text-sm font-bold flex items-center space-x-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-              <MapPin className="w-5 h-5 text-orange-500" />
-              <span>Unified Centre Plaza</span>
-            </p>
-            <p className="text-slate-500 text-sm font-bold flex items-center space-x-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-              <Timer className="w-5 h-5 text-orange-500" />
-              <span>08:30 AM - 10:30 AM • 04:30 PM - 07:00 PM</span>
-            </p>
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-ramos-red" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-red">Campus Services</span>
+          </div>
+          <h2 className="text-6xl font-bold text-ramos-black tracking-tighter leading-none mb-6">Laundry</h2>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center space-x-2 px-5 py-2.5 rounded-2xl bg-ramos-gray border border-ramos-black/5">
+              <MapPin className="w-4 h-4 text-ramos-red" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-ramos-black/60">Unified Centre Plaza</span>
+            </div>
+            <div className="flex items-center space-x-2 px-5 py-2.5 rounded-2xl bg-ramos-gray border border-ramos-black/5">
+              <Timer className="w-4 h-4 text-ramos-black/40" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-ramos-black/60">08:30 AM - 07:00 PM</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 px-6 py-3 rounded-2xl bg-orange-500 text-white shadow-xl shadow-orange-500/20 border border-orange-400">
-          <Zap className="w-5 h-5 animate-pulse" />
-          <span className="text-xs font-black uppercase tracking-widest text-nowrap">Unified Live Status</span>
+        <div className="flex items-center space-x-3 px-8 py-4 rounded-[24px] bg-ramos-black text-white shadow-2xl shadow-ramos-black/20 border border-white/5">
+          <Zap className="w-5 h-5 animate-pulse text-ramos-red" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em]">Service Status: Active</span>
         </div>
       </div>
 
-      {/* Main Grid: Horizontal Utilization */}
-      <div className="space-y-8">
-        {/* Active Request: Full Width Header when active */}
+      {/* Main Grid */}
+      <div className="space-y-10">
         <AnimatePresence>
           {activeRequest && (
             <motion.div 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white rounded-[40px] p-8 text-slate-900 relative overflow-hidden shadow-2xl shadow-orange-500/5 border-2 border-orange-100"
+              exit={{ opacity: 0, y: 20 }}
+              className="bg-ramos-black rounded-[48px] p-10 text-white relative overflow-hidden shadow-2xl shadow-ramos-black/20 border border-white/10"
             >
-              <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-ramos-red/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
               
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-                <div className="flex items-center space-x-6">
-                  <div className="w-20 h-20 rounded-[28px] bg-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-600/40">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10 relative z-10">
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 h-24 rounded-[32px] bg-ramos-red flex items-center justify-center text-white shadow-2xl shadow-ramos-red/40 border border-white/20">
                     <CheckCircle2 className="w-12 h-12" />
                   </div>
                   <div>
-                    <h4 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-2">Active Order {activeRequest.id}</h4>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h4 className="text-3xl font-bold tracking-tight">Order {activeRequest.id}</h4>
+                      <span className="text-[10px] font-black text-ramos-red uppercase tracking-[0.2em] bg-ramos-red/10 px-3 py-1.5 rounded-full border border-ramos-red/20">{activeRequest.status}</span>
+                    </div>
                     <div className="flex items-center space-x-4">
-                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100">{activeRequest.items} Items</span>
-                      <span className="text-xs font-black text-orange-600 uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full border border-orange-100">{activeRequest.status}</span>
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{activeRequest.items} Units Registered</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 max-w-xl">
-                  <div className="flex items-center justify-between mb-3 px-2">
-                    <div className="flex items-center space-x-2">
-                      <Timer className="w-5 h-5 text-orange-500" />
-                      <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Est. Ready in <span className="text-orange-600 ml-1">{countdown}</span></span>
+                  <div className="flex items-center justify-between mb-4 px-2">
+                    <div className="flex items-center space-x-3">
+                      <Clock className="w-5 h-5 text-ramos-red" />
+                      <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Estimated Completion: <span className="text-white ml-1">{countdown}</span></span>
                     </div>
-                    <span className="text-xs font-black text-orange-600 uppercase tracking-widest">
-                       {new Date(activeRequest.returnDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                       Return: {new Date(activeRequest.returnDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                     </span>
                   </div>
-                  <div className="h-5 w-full bg-slate-100 rounded-full overflow-hidden p-1 border border-slate-200">
+                  <div className="h-6 w-full bg-white/5 rounded-full overflow-hidden p-1.5 border border-white/10">
                     <motion.div 
                       key={countdown}
                       initial={{ opacity: 0.8 }}
                       animate={{ opacity: 1 }}
                       style={{ width: `${Math.max(5, 100 - ( (new Date(activeRequest.returnDate).getTime() - new Date().getTime()) / activeRequest.timeLeftMs * 100 ))}%` }}
-                      className="h-full bg-gradient-to-r from-orange-600 to-orange-400 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.3)]"
+                      className="h-full bg-ramos-red rounded-full shadow-[0_0_30px_rgba(255,46,0,0.5)]"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
                   <button 
                     onClick={handleEditClick}
-                    className="group flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-orange-600 hover:bg-orange-50 hover:border-orange-200 transition-all"
+                    className="p-5 rounded-[24px] bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-95"
                   >
-                    <Pencil className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
+                    <Pencil className="w-6 h-6" />
                   </button>
                   <button 
                     onClick={() => setShowCancelModal(true)}
-                    className="group flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-red-50 border border-red-100 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                    className="p-5 rounded-[24px] bg-ramos-red/10 border border-ramos-red/20 text-ramos-red hover:bg-ramos-red hover:text-white transition-all active:scale-95"
                   >
-                    <Trash2 className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
+                    <Trash2 className="w-6 h-6" />
                   </button>
                 </div>
               </div>
@@ -195,95 +199,93 @@ const Laundry: React.FC = () => {
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Col 1: Action */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* New Drop-off */}
           <div className={cn(
-            "bg-white border border-slate-200 rounded-[40px] p-8 shadow-sm transition-all",
-            activeRequest && "opacity-50 pointer-events-none grayscale"
+            "bg-white border border-ramos-black/5 rounded-[48px] p-10 shadow-2xl shadow-ramos-black/5 transition-all",
+            activeRequest && "opacity-40 pointer-events-none grayscale"
           )}>
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="p-3 rounded-2xl bg-orange-100 text-orange-600">
+            <div className="flex items-center space-x-4 mb-10">
+              <div className="p-4 rounded-[20px] bg-ramos-gray text-ramos-black border border-ramos-black/5">
                 <Shirt className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight italic uppercase">New Drop-off</h3>
+              <h3 className="text-2xl font-bold text-ramos-black tracking-tight">Drop-off</h3>
             </div>
 
-            <div className="space-y-6">
-              <div className="p-8 rounded-[32px] bg-slate-50 border border-slate-100 relative group">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Cloth count</label>
-                <div className="flex flex-col items-center space-y-6">
-                  <div className="w-24 h-24 rounded-3xl bg-white border-2 border-orange-500 flex flex-col items-center justify-center shadow-xl shadow-orange-500/10">
-                    <span className="text-4xl font-black text-orange-600">{activeRequest ? '-' : clothCount}</span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Items</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="10" 
-                    step="1"
-                    value={activeRequest ? 0 : clothCount}
-                    onChange={(e) => setClothCount(parseInt(e.target.value))}
-                    disabled={!!activeRequest}
-                    className="w-full accent-orange-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
-                  />
+            <div className="space-y-10">
+              <div className="p-10 rounded-[40px] bg-ramos-gray border border-ramos-black/5 relative flex flex-col items-center">
+                <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] mb-8">Cloth Count</label>
+                <div className="w-28 h-28 rounded-[36px] bg-white border border-ramos-black/5 flex flex-col items-center justify-center shadow-2xl shadow-ramos-black/5 mb-8">
+                  <span className="text-5xl font-bold text-ramos-black leading-none">{activeRequest ? '-' : clothCount}</span>
+                  <span className="text-[9px] font-black text-ramos-black/20 uppercase tracking-widest mt-2">Units</span>
                 </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="10" 
+                  step="1"
+                  value={activeRequest ? 0 : clothCount}
+                  onChange={(e) => setClothCount(parseInt(e.target.value))}
+                  disabled={!!activeRequest}
+                  className="w-full accent-ramos-red h-2 bg-white rounded-full appearance-none cursor-pointer border border-ramos-black/5"
+                />
               </div>
 
               <button 
                 onClick={() => handleRequest()}
                 disabled={clothCount === 0 || isSubmitting || !!activeRequest}
-                className="w-full py-5 rounded-[28px] bg-orange-500 text-white font-black text-sm uppercase tracking-widest hover:bg-orange-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all shadow-xl shadow-orange-500/20"
+                className="w-full py-6 rounded-[28px] bg-ramos-black text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-ramos-red disabled:opacity-20 transition-all shadow-2xl shadow-ramos-black/20 active:scale-95"
               >
                 {isSubmitting ? "Processing..." : "Confirm Drop-off"}
               </button>
             </div>
           </div>
 
-          {/* Col 2: Timings */}
-          <div className="bg-white border border-slate-200 rounded-[40px] p-8 shadow-sm">
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="p-3 rounded-2xl bg-orange-50 text-orange-600">
+          {/* Timings */}
+          <div className="bg-white border border-ramos-black/5 rounded-[48px] p-10 shadow-2xl shadow-ramos-black/5">
+            <div className="flex items-center space-x-4 mb-10">
+              <div className="p-4 rounded-[20px] bg-ramos-gray text-ramos-black border border-ramos-black/5">
                 <Clock className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black italic tracking-tight uppercase">Timings</h3>
+              <h3 className="text-2xl font-bold text-ramos-black tracking-tight">Service Slots</h3>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
                 { title: 'Morning Slot', text: '08:30 AM - 10:30 AM', icon: Zap },
                 { title: 'Evening Slot', text: '04:30 PM - 07:00 PM', icon: Clock },
-                { title: 'Processing', text: 'Starts 07:00 PM onwards', icon: History },
+                { title: 'Return Policy', text: '48 Hour Processing Cycle', icon: History },
               ].map((rule, i) => (
-                <div key={i} className="flex items-center space-x-4 p-4 rounded-[28px] bg-slate-50 border border-slate-100 group transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-orange-500 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <rule.icon className="w-6 h-6" />
+                <div key={i} className="flex items-center space-x-5 p-6 rounded-[32px] bg-ramos-gray border border-transparent hover:border-ramos-black/5 transition-all group">
+                  <div className="w-14 h-14 rounded-2xl bg-white border border-ramos-black/5 text-ramos-red flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                    <rule.icon className="w-7 h-7" />
                   </div>
                   <div>
-                    <h4 className="font-black text-slate-800 text-[10px] uppercase tracking-tighter italic leading-none mb-1">{rule.title}</h4>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{rule.text}</p>
+                    <h4 className="font-bold text-ramos-black text-xs uppercase tracking-tight mb-1">{rule.title}</h4>
+                    <p className="text-[10px] text-ramos-black/40 font-black uppercase tracking-widest">{rule.text}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Col 3: Support */}
-          <div className="bg-white border border-slate-200 rounded-[40px] p-8 text-slate-900 shadow-sm relative overflow-hidden group flex flex-col">
-            <div className="absolute inset-0 bg-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="flex items-center space-x-4 mb-8 relative z-10">
-              <div className="p-3 rounded-2xl bg-orange-50 text-orange-600 group-hover:scale-110 transition-transform">
-                <Sparkles className="w-6 h-6" />
+          {/* Support */}
+          <div className="bg-white border border-ramos-black/5 rounded-[48px] p-10 shadow-2xl shadow-ramos-black/5 flex flex-col group relative overflow-hidden">
+            <div className="absolute inset-0 bg-ramos-red/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center space-x-4 mb-10 relative z-10">
+              <div className="p-4 rounded-[20px] bg-ramos-gray text-ramos-black border border-ramos-black/5 group-hover:scale-110 transition-transform">
+                <Zap className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-black italic tracking-tight uppercase">Support</h3>
+              <h3 className="text-2xl font-bold text-ramos-black tracking-tight relative z-10">Support</h3>
             </div>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest leading-relaxed mb-10 relative z-10 px-1 font-black flex-1">
+            <p className="text-ramos-black/40 text-sm font-bold uppercase tracking-widest leading-relaxed mb-10 relative z-10 flex-1">
               Lost items or delay inquiries? Visit the Plaza counter or contact warden for authorization.
             </p>
             <button 
               onClick={() => setShowHistory(true)}
-              className="w-full py-5 rounded-[24px] bg-slate-900 text-white font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center space-x-2 relative z-10 shadow-xl shadow-slate-900/10"
+              className="w-full py-5 rounded-[24px] bg-ramos-black text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-ramos-red transition-all flex items-center justify-center space-x-3 shadow-2xl shadow-ramos-black/20 relative z-10"
             >
               <History className="w-4 h-4" />
-              <span>PAST HISTORY</span>
+              <span>Full Archive</span>
             </button>
           </div>
         </div>

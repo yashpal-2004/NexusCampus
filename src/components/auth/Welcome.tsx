@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Sparkles, 
   ArrowRight, 
   MessageSquare, 
   ShoppingBag, 
@@ -33,7 +32,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onGetStarted, userName }) => {
           className="mb-12"
         >
           <div className="w-20 h-20 rounded-[32px] bg-gradient-to-br from-orange-600 to-indigo-600 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-orange-600/20">
-            <Sparkles className="w-10 h-10 text-white" />
+            <Zap className="w-10 h-10 text-white fill-current" />
           </div>
           <h1 className="text-6xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] mb-6 italic">
             WELCOME TO <br />

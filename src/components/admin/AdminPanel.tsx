@@ -10,7 +10,7 @@ import {
   AlertCircle,
   ChevronRight,
   Search,
-  Sparkles,
+  RefreshCw,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -124,7 +124,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             onClick={onRestoreMocks}
             className="flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-100 hover:bg-orange-100 transition-all shadow-sm"
           >
-            <Sparkles className="w-4 h-4" />
+            <RefreshCw className="w-4 h-4" />
             <span>Restore All Mocks</span>
           </button>
 

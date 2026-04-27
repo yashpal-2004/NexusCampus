@@ -69,264 +69,312 @@ const BuddyCard: React.FC<BuddyCardProps> = ({
     <motion.div
       layout
       className={cn(
-        "bg-white border rounded-[40px] p-8 transition-all relative overflow-hidden",
-        isExpired ? "opacity-60 grayscale bg-slate-50 border-slate-200" : "border-slate-100 hover:border-orange-200 shadow-sm"
+        "relative overflow-hidden rounded-[56px] p-10 mb-10 border transition-all duration-1000 group",
+        isExpired 
+          ? "bg-ramos-gray/40 border-ramos-black/5 opacity-40 grayscale" 
+          : "bg-white border-ramos-black/5 shadow-2xl shadow-ramos-black/5 hover:border-ramos-red/20"
       )}
     >
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 overflow-hidden border border-slate-200">
-            {post.authorPhoto ? (
-              <img src={post.authorPhoto} alt={post.authorName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            ) : (
-              <User className="w-6 h-6" />
-            )}
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h4 className="text-sm font-black text-slate-900 tracking-tight">{post.authorName}</h4>
-              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span className="text-[10px] font-bold text-slate-400">{formatDistanceToNow(ensureMillis(post.createdAt))} ago</span>
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-orange-500 mt-1">{post.category}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-           {(isJoined || isCreator) && !isExpired && post.allowDMs && (
-             <button 
-               onClick={() => setIsMessaging(!isMessaging)}
-               className={cn(
-                 "p-2.5 rounded-2xl transition-all border",
-                 isMessaging ? "bg-slate-900 text-white border-slate-900" : "bg-slate-50 text-slate-400 border-slate-100 hover:bg-slate-100"
-               )}
-             >
-               <MessageCircle className="w-4 h-4" />
-             </button>
-           )}
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{post.title}</h3>
-        <p className="text-sm text-slate-500 leading-relaxed font-medium">{post.description}</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="flex items-center space-x-2.5 bg-slate-50 rounded-2xl p-3 border border-slate-100">
-          <MapPin className="w-4 h-4 text-orange-500" />
-          <div className="flex flex-col min-w-0">
-            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Venue</span>
-            <span className="text-[11px] font-bold text-slate-600 truncate uppercase">{post.location || post.category}</span>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2.5 bg-slate-50 rounded-2xl p-3 border border-slate-100">
-          <Calendar className="w-4 h-4 text-orange-500" />
-          <div className="flex flex-col min-w-0">
-            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Date</span>
-            <span className="text-[11px] font-bold text-slate-600 truncate">{post.date || 'Flexible'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Participants List */}
-      <div className="mb-6 space-y-3">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Collaborators</p>
-        <div className="flex flex-wrap gap-2">
-          {/* Host */}
-          <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-sm">
-            <div className="w-5 h-5 rounded-lg bg-orange-500 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden border border-orange-600">
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-10">
+          <div className="flex items-center space-x-5">
+            <div className={cn(
+              "w-20 h-20 rounded-[32px] flex items-center justify-center border transition-all duration-500 overflow-hidden shadow-2xl shadow-ramos-black/5",
+              isExpired ? "bg-white border-ramos-black/5" : "bg-ramos-gray border-ramos-black/5 group-hover:scale-105"
+            )}>
               {post.authorPhoto ? (
-                <img src={post.authorPhoto} alt={post.authorName} className="w-full h-full object-cover" />
+                <img src={post.authorPhoto} alt={post.authorName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
-                <span className="leading-none">{post.authorName?.[0]}</span>
-              )}
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black text-slate-900 leading-none">{post.authorName}</span>
-              <span className="text-[7px] font-black text-orange-500 uppercase tracking-tighter mt-0.5">Host Author</span>
-            </div>
-          </div>
-
-          {/* Others */}
-          {post.joinedUids?.filter(uid => uid !== post.authorUid).map((uid) => {
-             const p = allUsers.find(u => u.uid === uid);
-             if (!p) return null;
-             return (
-               <div key={uid} className="flex items-center space-x-2 bg-slate-50 border border-slate-100 rounded-xl px-2.5 py-1.5 shadow-sm">
-                 <div className="w-5 h-5 rounded-lg bg-orange-200 flex items-center justify-center text-[10px] font-bold text-orange-600 overflow-hidden border border-orange-200">
-                   {p.photoURL ? (
-                     <img src={p.photoURL} alt={p.displayName} className="w-full h-full object-cover" />
-                   ) : (
-                     <span className="leading-none">{p.displayName?.[0]}</span>
-                   )}
-                 </div>
-                 <div className="flex flex-col">
-                   <span className="text-[10px] font-black text-slate-900 leading-none">{p.displayName}</span>
-                   <span className="text-[7px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">Connected</span>
-                 </div>
-               </div>
-             );
-          })}
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {isMessaging && (isJoined || isCreator) && !isExpired && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-8 p-6 bg-slate-50 rounded-[32px] border border-slate-100"
-          >
-            <div className="max-h-48 overflow-y-auto mb-6 space-y-4 pr-2 custom-scrollbar">
-              {post.messages && post.messages.length > 0 ? (
-                post.messages.map((msg) => (
-                  <div key={msg.id} className={cn(
-                    "flex flex-col",
-                    msg.senderUid === currentUserId ? "items-end" : "items-start"
-                  )}>
-                    <div className="flex items-center space-x-2 mb-1.5 px-1">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{msg.senderName}</span>
-                      <span className="text-[8px] font-bold text-slate-300">{formatDistanceToNow(ensureMillis(msg.createdAt))} ago</span>
-                    </div>
-                    <div className={cn(
-                      "px-5 py-3 rounded-[24px] text-xs font-medium max-w-[85%] shadow-sm",
-                      msg.senderUid === currentUserId 
-                        ? "bg-orange-500 text-white rounded-tr-none" 
-                        : "bg-white text-slate-700 rounded-tl-none border border-slate-100"
-                    )}>
-                      {msg.content}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <MessageCircle className="w-8 h-8 text-slate-200 mx-auto mb-3" />
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">No messages yet</p>
+                <div className="w-full h-full flex items-center justify-center bg-ramos-black text-white font-bold text-2xl">
+                   {post.authorName?.[0]}
                 </div>
               )}
             </div>
-            <div className="flex items-center space-x-2 bg-white p-1.5 rounded-2xl border border-slate-200">
-              <input 
-                type="text"
-                value={messageContent}
-                onChange={(e) => setMessageContent(e.target.value)}
-                placeholder="Type your message..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && messageContent.trim()) {
-                    onSendMessage(post.id, messageContent);
-                    setMessageContent('');
-                  }
-                }}
-                className="flex-1 bg-transparent py-2 px-4 text-xs font-medium outline-none"
-              />
-              <button 
-                onClick={() => {
-                  if (messageContent.trim()) {
-                    onSendMessage(post.id, messageContent);
-                    setMessageContent('');
-                  }
-                }}
-                className="p-3 rounded-xl bg-slate-900 text-white shadow-xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+            <div>
+              <div className="flex items-center space-x-3 mb-1">
+                <h4 className={cn("text-xl font-bold tracking-tight", isExpired ? "text-ramos-black/40" : "text-ramos-black")}>{post.authorName}</h4>
+                <div className="w-1.5 h-1.5 rounded-full bg-ramos-red" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-ramos-black/20">
+                  {formatDistanceToNow(ensureMillis(post.createdAt))} ago
+                </span>
+              </div>
+              <div className="flex items-center space-x-3">
+                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-red">{post.category}</span>
+                 {isExpired && <span className="text-[9px] font-black uppercase tracking-[0.3em] text-ramos-black/20 bg-ramos-black/5 px-2 py-1 rounded-full border border-ramos-black/5">Archived</span>}
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-        <div className="flex items-center space-x-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          <Users className="w-4 h-4" />
-          <span>{post.joinedUids?.length || 1} Connected</span>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+             {(isJoined || isCreator) && !isExpired && post.allowDMs && (
+               <button 
+                 onClick={() => setIsMessaging(!isMessaging)}
+                 className={cn(
+                   "p-5 rounded-[24px] transition-all border group/msg",
+                   isMessaging 
+                    ? "bg-ramos-black text-white border-ramos-black shadow-2xl shadow-ramos-black/40" 
+                    : "bg-ramos-gray text-ramos-black/20 border-transparent hover:text-ramos-black hover:bg-ramos-gray/80"
+                 )}
+               >
+                 <MessageCircle className={cn("w-6 h-6 transition-transform group-hover/msg:scale-110", isMessaging ? "text-ramos-red" : "")} />
+               </button>
+             )}
+          </div>
         </div>
-        
-        <div className="flex items-center space-x-2">
-          {isCreator ? (
-            <div className="flex items-center space-x-2">
-              {!isExpired && (
-                <button 
-                  disabled={isClosing}
-                  onClick={async () => {
-                    setIsClosing(true);
-                    try {
-                      await onClose(post.id);
-                    } finally {
-                      setIsClosing(false);
+
+        <div className="mb-10">
+          <h3 className={cn("text-3xl font-bold tracking-tight mb-5 leading-tight", isExpired ? "text-ramos-black/40" : "text-ramos-black group-hover:text-ramos-red transition-colors")}>{post.title}</h3>
+          <div className={cn(
+            "rounded-[40px] p-8 border transition-all duration-500",
+            isExpired ? "bg-white/50 border-ramos-black/5" : "bg-ramos-gray/30 border-transparent group-hover:bg-ramos-gray/50"
+          )}>
+            <p className={cn("text-lg font-bold leading-relaxed tracking-tight", isExpired ? "text-ramos-black/30" : "text-ramos-black/60")}>
+              {post.description}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className={cn(
+            "flex items-center space-x-5 rounded-[32px] p-6 border transition-all",
+            isExpired ? "bg-white border-ramos-black/5" : "bg-ramos-gray/50 border-transparent"
+          )}>
+            <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-ramos-black/5 text-ramos-red shadow-sm group-hover:scale-105 transition-transform">
+              <MapPin className="w-7 h-7" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[9px] font-black text-ramos-black/20 uppercase tracking-[0.3em] mb-1.5">Primary Venue</span>
+              <span className={cn("text-sm font-bold truncate uppercase tracking-tight", isExpired ? "text-ramos-black/30" : "text-ramos-black/70")}>{post.location || post.category}</span>
+            </div>
+          </div>
+          <div className={cn(
+            "flex items-center space-x-5 rounded-[32px] p-6 border transition-all",
+            isExpired ? "bg-white border-ramos-black/5" : "bg-ramos-gray/50 border-transparent"
+          )}>
+            <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-ramos-black/5 text-ramos-red shadow-sm group-hover:scale-105 transition-transform">
+              <Calendar className="w-7 h-7" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[9px] font-black text-ramos-black/20 uppercase tracking-[0.3em] mb-1.5">Engagement Schedule</span>
+              <span className={cn("text-sm font-bold truncate tracking-tight", isExpired ? "text-ramos-black/30" : "text-ramos-black/70")}>{post.date || 'Flexible'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Participants List */}
+        <div className="mb-12 space-y-6">
+          <div className="flex items-center space-x-3 ml-2">
+            <div className="w-1 h-1 rounded-full bg-ramos-red" />
+            <p className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em]">Network Entities</p>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {/* Host */}
+            <div className={cn(
+              "flex items-center space-x-4 rounded-[28px] px-6 py-3 border transition-all shadow-xl shadow-ramos-black/5",
+              isExpired ? "bg-white border-ramos-black/5" : "bg-ramos-red/5 border-ramos-red/10"
+            )}>
+              <div className="w-8 h-8 rounded-xl bg-ramos-red flex items-center justify-center text-[10px] font-black text-white overflow-hidden shadow-2xl shadow-ramos-red/40">
+                {post.authorPhoto ? (
+                  <img src={post.authorPhoto} alt={post.authorName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="leading-none">{post.authorName?.[0]}</span>
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className={cn("text-sm font-bold tracking-tight leading-none", isExpired ? "text-ramos-black/40" : "text-ramos-black")}>{post.authorName}</span>
+                <span className="text-[8px] font-black text-ramos-red uppercase tracking-widest mt-1">Host Entity</span>
+              </div>
+            </div>
+
+            {/* Others */}
+            {post.joinedUids?.filter(uid => uid !== post.authorUid).map((uid) => {
+               const p = allUsers.find(u => u.uid === uid);
+               if (!p) return null;
+               return (
+                 <div key={uid} className={cn(
+                    "flex items-center space-x-4 rounded-[28px] px-6 py-3 border transition-all shadow-xl shadow-ramos-black/5",
+                    isExpired ? "bg-white border-ramos-black/5" : "bg-ramos-gray/40 border-ramos-black/5"
+                 )}>
+                   <div className="w-8 h-8 rounded-xl bg-ramos-black flex items-center justify-center text-[10px] font-black text-white overflow-hidden shadow-2xl shadow-ramos-black/10">
+                     {p.photoURL ? (
+                       <img src={p.photoURL} alt={p.displayName} className="w-full h-full object-cover" />
+                     ) : (
+                       <span className="leading-none">{p.displayName?.[0]}</span>
+                     )}
+                   </div>
+                   <div className="flex flex-col">
+                     <span className={cn("text-sm font-bold tracking-tight leading-none", isExpired ? "text-ramos-black/30" : "text-ramos-black/60")}>{p.displayName}</span>
+                     <span className="text-[8px] font-black text-ramos-black/20 uppercase tracking-widest mt-1">Subscriber</span>
+                   </div>
+                 </div>
+               );
+            })}
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {isMessaging && (isJoined || isCreator) && !isExpired && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="mb-12 bg-ramos-gray/40 border border-ramos-black/5 rounded-[48px] p-10 shadow-inner"
+            >
+              <div className="max-h-80 overflow-y-auto mb-8 space-y-6 pr-4 no-scrollbar">
+                {post.messages && post.messages.length > 0 ? (
+                  post.messages.map((msg) => (
+                    <div key={msg.id} className={cn(
+                      "flex flex-col",
+                      msg.senderUid === currentUserId ? "items-end" : "items-start"
+                    )}>
+                      <div className="flex items-center space-x-3 mb-2 px-2">
+                        <span className="text-[9px] font-black text-ramos-black/30 uppercase tracking-[0.2em]">{msg.senderName}</span>
+                        <div className="w-1 h-1 rounded-full bg-ramos-black/10" />
+                        <span className="text-[8px] text-ramos-black/20 font-black uppercase tracking-widest">{formatDistanceToNow(ensureMillis(msg.createdAt))}</span>
+                      </div>
+                      <div className={cn(
+                        "px-8 py-5 rounded-[32px] text-sm font-bold max-w-[85%] shadow-2xl tracking-tight leading-relaxed",
+                        msg.senderUid === currentUserId 
+                          ? "bg-ramos-black text-white rounded-tr-none shadow-ramos-black/20" 
+                          : "bg-white text-ramos-black rounded-tl-none border border-ramos-black/5 shadow-ramos-black/5"
+                      )}>
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 rounded-[24px] bg-white border border-ramos-black/5 flex items-center justify-center text-ramos-black/10 mx-auto mb-4">
+                      <MessageCircle className="w-8 h-8" />
+                    </div>
+                    <p className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em]">Secure Channel Active</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center space-x-4">
+                <input 
+                  type="text"
+                  value={messageContent}
+                  onChange={(e) => setMessageContent(e.target.value)}
+                  placeholder="Draft encrypted message..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && messageContent.trim()) {
+                      onSendMessage(post.id, messageContent);
+                      setMessageContent('');
                     }
                   }}
-                  className={cn(
-                    "px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border",
-                    isClosing 
-                      ? "bg-slate-50 text-slate-300 border-slate-100 cursor-wait" 
-                      : "bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200"
-                  )}
-                >
-                  {isClosing ? 'Closing...' : 'Close'}
-                </button>
-              )}
-              {canExtend && (
-                <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
-                  <input 
-                    type="number" 
-                    value={extendMins}
-                    onChange={(e) => setExtendMins(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-10 bg-transparent text-center text-xs font-bold text-slate-900 outline-none"
-                  />
-                  <button 
-                    onClick={() => onExtend(post.id, extendMins)}
-                    className="px-4 py-2 rounded-xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
-                  >
-                    Extend {graceTimeLeft !== null && `(${graceTimeLeft}s)`}
-                  </button>
-                </div>
-              )}
-              <button 
-                onClick={() => onDelete(post.id)}
-                className="flex items-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete</span>
-              </button>
-            </div>
-          ) : (
-            !isExpired && (
-              <div className="flex items-center space-x-2">
-                {isJoined && (
-                  <button 
-                    onClick={() => onLeave(post.id)}
-                    className="px-5 py-2.5 rounded-2xl bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 transition-all border border-red-100"
-                  >
-                    Disconnect
-                  </button>
-                )}
+                  className="flex-1 bg-white border border-ramos-black/5 rounded-[28px] py-6 px-10 text-sm font-bold text-ramos-black placeholder:text-ramos-black/20 transition-all outline-none focus:border-ramos-red/20 focus:shadow-2xl focus:shadow-ramos-red/5"
+                />
                 <button 
-                  onClick={() => !isJoined && onConnect(post.id)}
-                  disabled={isJoined}
-                  className={cn(
-                    "flex items-center space-x-2 px-6 py-2.5 rounded-[24px] text-xs font-black uppercase tracking-widest transition-all",
-                    isJoined 
-                      ? "bg-green-50 text-green-600 border border-green-200 cursor-default" 
-                      : "bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 hover:scale-105 active:scale-95"
-                  )}
+                  onClick={() => {
+                    if (messageContent.trim()) {
+                      onSendMessage(post.id, messageContent);
+                      setMessageContent('');
+                    }
+                  }}
+                  className="p-6 rounded-[28px] bg-ramos-black text-white shadow-2xl shadow-ramos-black/40 hover:bg-ramos-red hover:scale-105 active:scale-95 transition-all group"
                 >
-                  {isJoined ? (
-                    <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Connected</span>
-                    </>
-                  ) : (
-                    <>
-                      <MessageCircle className="w-4 h-4" />
-                      <span>Connect</span>
-                    </>
-                  )}
+                  <Plus className="w-7 h-7 group-hover:rotate-90 transition-transform" />
                 </button>
               </div>
-            )
+            </motion.div>
           )}
+        </AnimatePresence>
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between pt-10 border-t border-ramos-black/5 gap-6">
+          <div className={cn(
+            "flex items-center space-x-4 px-6 py-3 rounded-full border transition-all w-fit",
+            isExpired ? "bg-white border-ramos-black/5 text-ramos-black/20" : "bg-ramos-gray/60 border-ramos-black/5 text-ramos-black/40"
+          )}>
+            <Users className="w-5 h-5" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{post.joinedUids?.length || 1} Entities Connected</span>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-4">
+            {isCreator ? (
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                {!isExpired && (
+                  <button 
+                    disabled={isClosing}
+                    onClick={async () => {
+                      setIsClosing(true);
+                      try {
+                        await onClose(post.id);
+                      } finally {
+                        setIsClosing(false);
+                      }
+                    }}
+                    className={cn(
+                      "px-8 py-4 rounded-[24px] text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
+                      isClosing 
+                        ? "bg-white text-ramos-black/10 border-ramos-black/5 cursor-wait" 
+                        : "bg-ramos-gray text-ramos-black/40 border-transparent hover:bg-ramos-black hover:text-white"
+                    )}
+                  >
+                    {isClosing ? 'Closing Request...' : 'Close Request'}
+                  </button>
+                )}
+                {canExtend && (
+                  <div className="flex items-center space-x-3 bg-ramos-black p-2 rounded-[24px] shadow-2xl shadow-ramos-black/20">
+                    <input 
+                      type="number" 
+                      value={extendMins}
+                      onChange={(e) => setExtendMins(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-14 bg-transparent text-center text-xs font-black text-white outline-none"
+                    />
+                    <button 
+                      onClick={() => onExtend(post.id, extendMins)}
+                      className="px-6 py-3 rounded-[20px] bg-ramos-red text-white text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl shadow-ramos-red/20"
+                    >
+                      Extend {graceTimeLeft !== null && `(${graceTimeLeft}s)`}
+                    </button>
+                  </div>
+                )}
+                <button 
+                  onClick={() => onDelete(post.id)}
+                  className="flex items-center space-x-3 px-8 py-4 rounded-[24px] bg-ramos-red/5 text-ramos-red text-[10px] font-black uppercase tracking-[0.2em] hover:bg-ramos-red hover:text-white transition-all border border-ramos-red/10 active:scale-95 shadow-xl shadow-ramos-red/5"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            ) : (
+              !isExpired && (
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                  {isJoined && (
+                    <button 
+                      onClick={() => onLeave(post.id)}
+                      className="px-8 py-5 rounded-[28px] bg-ramos-red/10 text-ramos-red text-[10px] font-black uppercase tracking-[0.2em] hover:bg-ramos-red hover:text-white transition-all border border-ramos-red/20 active:scale-95 shadow-xl shadow-ramos-red/5"
+                    >
+                      Leave Buddy Group
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => !isJoined && onConnect(post.id)}
+                    disabled={isJoined}
+                    className={cn(
+                      "flex items-center space-x-5 px-12 py-5 rounded-[28px] text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-700",
+                      isJoined 
+                        ? "bg-green-500/10 text-green-500 border border-green-500/20 cursor-default" 
+                        : "bg-ramos-black text-white hover:bg-ramos-red hover:scale-105 active:scale-95 shadow-2xl shadow-ramos-black/40"
+                    )}
+                  >
+                    {isJoined ? (
+                      <>
+                        <CheckCircle2 className="w-6 h-6" />
+                        <span>Connected</span>
+                      </>
+                    ) : (
+                      <>
+                        <MessageCircle className="w-6 h-6" />
+                        <span>Join Buddy Group</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

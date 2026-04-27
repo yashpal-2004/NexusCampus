@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Hexagon } from 'lucide-react';
+import { Menu, X, LayoutGrid } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface LayoutProps {
@@ -17,72 +17,63 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex overflow-x-hidden">
+    <div className="min-h-screen bg-white text-ramos-black flex overflow-x-hidden font-sans">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-[60] flex items-center justify-between px-6">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-md border-b border-ramos-gray z-[60] flex items-center justify-between px-8">
         <div className="flex items-center space-x-2">
-          <Hexagon className="w-6 h-6 text-orange-500 fill-current" />
-          <h1 className="text-xl font-black text-slate-900 tracking-tighter">
-            Nexus<span className="text-orange-500">Campus</span>
+          <div className="w-8 h-8 rounded-full bg-ramos-red flex items-center justify-center">
+            <LayoutGrid className="w-4 h-4 text-white" />
+          </div>
+          <h1 className="text-xl font-bold text-ramos-black tracking-tighter">
+            NexusCampus
           </h1>
         </div>
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+          className="p-2 rounded-full bg-ramos-gray text-ramos-black hover:bg-ramos-black hover:text-white transition-all"
         >
           {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-          setIsSidebarOpen(false);
-        }} 
-        user={user} 
-        sessions={sessions}
-        onLogout={onLogout} 
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      {user && (
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setIsSidebarOpen(false);
+          }} 
+          user={user} 
+          sessions={sessions}
+          onLogout={onLogout} 
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      )}
       
       <main className={cn(
-        "flex-1 min-h-screen relative overflow-x-hidden pt-16 lg:pt-0 transition-all duration-300",
-        "lg:ml-64"
+        "flex-1 min-h-screen relative overflow-x-hidden pt-20 lg:pt-0 transition-all duration-500",
+        user ? "lg:ml-72" : "m-0 p-0"
       )}>
-        {/* Background Decorative Elements */}
-        <div className="fixed top-0 right-0 w-[60%] h-[60%] bg-orange-500/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
-        <div className="fixed bottom-0 left-0 w-[40%] h-[40%] bg-pink-500/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+        {/* Subtle Background Detail */}
+        <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-ramos-red/5 blur-[120px] rounded-full -z-10 pointer-events-none animate-float" />
         
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="w-full h-full"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            className="w-full h-full p-6 lg:p-12"
           >
             {children}
           </motion.div>
         </AnimatePresence>
       </main>
-
-      {/* Mobile Overlay */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };
 
 export default Layout;
+

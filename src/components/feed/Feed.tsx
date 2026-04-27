@@ -3,7 +3,7 @@ import { StudentQuery, BlinkitRequest } from '../../types';
 import QueryCard from './QueryCard';
 import BlinkitCard from './BlinkitCard';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Zap } from 'lucide-react';
 import { ensureMillis } from '../../lib/utils';
 
 interface FeedProps {
@@ -58,11 +58,23 @@ const Feed: React.FC<FeedProps> = ({
   ].sort((a, b) => ensureMillis(b.createdAt) - ensureMillis(a.createdAt));
 
   return (
-    <div className="max-w-2xl mx-auto pt-8 pb-24 px-4 relative">
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-5xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
-          Campus Catch-up
-        </h2>
+    <div className="max-w-3xl mx-auto pt-12 pb-32 px-6 relative">
+      <div className="flex flex-col space-y-2 mb-16">
+        <div className="flex items-center space-x-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-ramos-red animate-pulse" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-red">Live Campus</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <h2 className="text-6xl font-bold text-ramos-black tracking-tighter leading-none">
+            Campus Hub
+          </h2>
+          <div className="hidden md:flex items-center space-x-4">
+             <div className="px-4 py-2 rounded-2xl bg-ramos-gray border border-ramos-black/5 flex items-center space-x-2">
+                <Zap className="w-4 h-4 text-ramos-red" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-ramos-black/40">{allItems.length} Recent Posts</span>
+             </div>
+          </div>
+        </div>
       </div>
 
       <AnimatePresence mode="popLayout">
@@ -70,10 +82,11 @@ const Feed: React.FC<FeedProps> = ({
           <motion.div
             key={item.id}
             layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mb-8"
           >
             {item.type === 'query' ? (
               <QueryCard 
@@ -103,12 +116,13 @@ const Feed: React.FC<FeedProps> = ({
 
       {/* Floating Action Button */}
       <motion.button
-        whileHover={{ scale: 1.1, rotate: 90 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.95 }}
         onClick={onOpenPostModal}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-2xl shadow-orange-500/20 z-40 border border-white/20"
+        className="fixed bottom-12 right-12 px-8 py-5 rounded-[32px] bg-ramos-black text-white flex items-center space-x-4 shadow-2xl shadow-ramos-black/20 z-40 border border-white/10 group transition-all"
       >
-        <Plus className="w-8 h-8" />
+        <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500" />
+        <span className="text-sm font-bold uppercase tracking-widest">Create Post</span>
       </motion.button>
     </div>
   );

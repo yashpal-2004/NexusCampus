@@ -11,7 +11,6 @@ import {
   Check,
   ShieldOff,
   MessageSquare,
-  Sparkles,
   UserX
 } from 'lucide-react';
 import { UserProfile } from '../../types';

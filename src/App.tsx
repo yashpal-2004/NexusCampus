@@ -49,7 +49,7 @@ import MyActivity from './components/profile/MyActivity';
 import AdminPanel from './components/admin/AdminPanel';
 
 // Components
-import Login from './components/auth/Login';
+import LandingPage from './components/landing/LandingPage';
 import Loading from './components/layout/Loading';
 import Welcome from './components/auth/Welcome';
 import ErrorBoundary from './components/layout/ErrorBoundary';
@@ -308,7 +308,14 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleLogout = () => signOut(auth);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const handlePostQuery = async (content: string, imageUrl?: string) => {
     if (!user) return;
@@ -486,8 +493,7 @@ const AppContent: React.FC = () => {
     try {
       await updateDoc(doc(db, 'blinkit_requests', id), { 
         status: 'completed', 
-        closedAt: Date.now(),
-        expiresAt: Date.now() - 1000
+        closedAt: Date.now()
       });
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, `blinkit_requests/${id}`);
@@ -627,7 +633,16 @@ const AppContent: React.FC = () => {
   const handleJoinBuddy = async (id: string) => handleJoinBlinkit(id);
   const handleLeaveBuddy = async (id: string) => handleLeaveBlinkit(id);
   const handleSendBuddyMessage = async (id: string, content: string) => handleSendBlinkitMessage(id, content);
-  const handleCloseBuddy = async (id: string) => handleDeleteBlinkit(id);
+  const handleCloseBuddy = async (id: string) => {
+    try {
+      await updateDoc(doc(db, 'blinkit_requests', id), { 
+        status: 'completed', 
+        closedAt: Date.now()
+      });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `blinkit_requests/${id}`);
+    }
+  };
   const handleExtendBuddy = async (id: string, mins: number) => handleExtendBlinkit(id, mins);
   const handleUpdateBuddy = async (id: string, updates: any) => {
     try {
@@ -692,113 +707,15 @@ const AppContent: React.FC = () => {
 
   if (loading) return <Loading />;
 
-  const renderContent = () => {
-    if (!user) return <Login onLogin={handleLogin} isLoading={isLoginLoading} error={loginError} />;
-
-    switch (activeTab) {
-      case 'home':
-        return (
-          <Feed 
-            queries={queries} 
-            blinkitRequests={homeBlinkitRequests}
-            onUpvote={handleUpvote}
-            onReply={handleReply}
-            onJoinBlinkit={handleJoinBlinkit}
-            onLeaveBlinkit={handleLeaveBlinkit}
-            onCloseBlinkit={handleCloseBlinkit}
-            onDeleteBlinkit={handleDeleteBlinkit}
-            onExtendBlinkit={handleExtendBlinkit}
-            onSendBlinkitMessage={handleSendBlinkitMessage}
-            onRemoveBlinkitParticipant={handleRemoveBlinkitParticipant}
-            onBlockBlinkitParticipant={handleBlockBlinkitParticipant}
-            onOpenPostModal={() => setIsPostModalOpen(true)}
-            onDeleteQuery={handleDeleteQuery}
-            currentUserId={user.uid}
-          />
-        );
-      case 'my-activity':
-        return (
-          <MyActivity 
-            userQueries={queries.filter(q => q.authorUid === user.uid)} 
-            expiredBlinkitRequests={allBlinkitRequests.filter(r => (r.authorUid === user.uid || r.joinedUids?.includes(user.uid)) && r.status !== 'active')}
-            expiredBuddyRequests={buddyPosts.filter(p => (p.authorUid === user.uid || p.joinedUids?.includes(user.uid)) && p.status !== 'active')}
-            onReply={handleReply} 
-            onResolve={handleResolveQuery}
-            onExtendBlinkit={handleExtendBlinkit}
-            onExtendBuddy={handleExtendBuddy}
-            onDeleteBlinkit={handleDeleteBlinkit}
-            currentUserId={user.uid}
-            allUsers={allUsers}
-          />
-        );
-      case 'messages':
-        return <Messaging user={user} messages={messages} sessions={chatSessions} onSendMessage={handleSendMessage} />;
-      case 'find-buddy':
-        return (
-          <BuddyFinder 
-            posts={buddyPosts}
-            onPostBuddy={handlePostBuddy}
-            onConnect={handleJoinBuddy}
-            onLeaveBuddy={handleLeaveBuddy}
-            onSendMessage={handleSendBuddyMessage}
-            onDeleteBuddy={handleDeleteBuddy}
-            onCloseBuddy={handleCloseBuddy}
-            onExtendBuddy={handleExtendBuddy}
-            onUpdateBuddy={handleUpdateBuddy}
-            currentUserId={user.uid}
-            allUsers={allUsers}
-          />
-        );
-      case 'wellness':
-        return <Wellness onAskAI={handleAskAI} />;
-      case 'support':
-        return <Support />;
-      case 'laundry':
-        return <Laundry />;
-      case 'food-court':
-        return <FoodCourt />;
-      case 'profile':
-        return (
-          <Profile 
-            profile={user} 
-            allUsers={allUsers}
-            onUpdateProfile={handleUpdateProfile}
-            onUnblockUser={handleUnblockUser}
-            onLogout={handleLogout} 
-            initialSection={profileSection}
-          />
-        );
-      case 'admin':
-        return (
-          <AdminPanel 
-            queries={queries}
-            blinkitRequests={blinkitRequests}
-            users={allUsers}
-            buddyPosts={buddyPosts}
-            onDeleteQuery={async (id) => {
-              if (id.startsWith('mock_')) {
-                const configRef = doc(db, 'system', 'config');
-                await setDoc(configRef, { 
-                  deleted_mocks: arrayUnion(id) 
-                }, { merge: true });
-              } else {
-                handleDeleteQuery(id);
-              }
-            }}
-            onRestoreMocks={async () => {
-              const configRef = doc(db, 'system', 'config');
-              await setDoc(configRef, { deleted_mocks: [] }, { merge: true });
-            }}
-            onDeleteBlinkit={handleDeleteBlinkit}
-            onDeleteBuddy={handleDeleteBuddy}
-            onResolveQuery={handleResolveQuery}
-            onDeleteUser={handleDeleteUser}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  if (!user) {
+    return (
+      <LandingPage 
+        onLogin={handleLogin} 
+        isLoading={isLoginLoading} 
+        error={loginError} 
+      />
+    );
+  }
 
   return (
     <Layout 
@@ -808,7 +725,113 @@ const AppContent: React.FC = () => {
       sessions={chatSessions} 
       onLogout={handleLogout}
     >
-      {renderContent()}
+      {(() => {
+        switch (activeTab) {
+          case 'home':
+            return (
+              <Feed 
+                queries={queries} 
+                blinkitRequests={homeBlinkitRequests}
+                onUpvote={handleUpvote}
+                onReply={handleReply}
+                onJoinBlinkit={handleJoinBlinkit}
+                onLeaveBlinkit={handleLeaveBlinkit}
+                onCloseBlinkit={handleCloseBlinkit}
+                onDeleteBlinkit={handleDeleteBlinkit}
+                onExtendBlinkit={handleExtendBlinkit}
+                onSendBlinkitMessage={handleSendBlinkitMessage}
+                onRemoveBlinkitParticipant={handleRemoveBlinkitParticipant}
+                onBlockBlinkitParticipant={handleBlockBlinkitParticipant}
+                onOpenPostModal={() => setIsPostModalOpen(true)}
+                onDeleteQuery={handleDeleteQuery}
+                currentUserId={user.uid}
+              />
+            );
+          case 'my-activity':
+            return (
+              <MyActivity 
+                userQueries={queries.filter(q => q.authorUid === user.uid)} 
+                expiredBlinkitRequests={allBlinkitRequests.filter(r => (r.authorUid === user.uid || r.joinedUids?.includes(user.uid)) && r.status !== 'active')}
+                expiredBuddyRequests={buddyPosts.filter(p => (p.authorUid === user.uid || p.joinedUids?.includes(user.uid)) && p.status !== 'active')}
+                onReply={handleReply} 
+                onResolve={handleResolveQuery}
+                onExtendBlinkit={handleExtendBlinkit}
+                onExtendBuddy={handleExtendBuddy}
+                onDeleteBlinkit={handleDeleteBlinkit}
+                onLeaveBlinkit={handleLeaveBlinkit}
+                onCloseBlinkit={handleCloseBlinkit}
+                currentUserId={user.uid}
+                allUsers={allUsers}
+              />
+            );
+          case 'messages':
+            return <Messaging user={user} messages={messages} sessions={chatSessions} onSendMessage={handleSendMessage} />;
+          case 'find-buddy':
+            return (
+              <BuddyFinder 
+                posts={buddyPosts}
+                onPostBuddy={handlePostBuddy}
+                onConnect={handleJoinBuddy}
+                onLeaveBuddy={handleLeaveBuddy}
+                onSendMessage={handleSendBuddyMessage}
+                onDeleteBuddy={handleDeleteBuddy}
+                onCloseBuddy={handleCloseBuddy}
+                onExtendBuddy={handleExtendBuddy}
+                onUpdateBuddy={handleUpdateBuddy}
+                currentUserId={user.uid}
+                allUsers={allUsers}
+              />
+            );
+          case 'wellness':
+            return <Wellness onAskAI={handleAskAI} />;
+          case 'support':
+            return <Support />;
+          case 'laundry':
+            return <Laundry />;
+          case 'food-court':
+            return <FoodCourt />;
+          case 'profile':
+            return (
+              <Profile 
+                profile={user} 
+                allUsers={allUsers}
+                onUpdateProfile={handleUpdateProfile}
+                onUnblockUser={handleUnblockUser}
+                onLogout={handleLogout} 
+                initialSection={profileSection}
+              />
+            );
+          case 'admin':
+            return (
+              <AdminPanel 
+                queries={queries}
+                blinkitRequests={blinkitRequests}
+                users={allUsers}
+                buddyPosts={buddyPosts}
+                onDeleteQuery={async (id) => {
+                  if (id.startsWith('mock_')) {
+                    const configRef = doc(db, 'system', 'config');
+                    await setDoc(configRef, { 
+                      deleted_mocks: arrayUnion(id) 
+                    }, { merge: true });
+                  } else {
+                    handleDeleteQuery(id);
+                  }
+                }}
+                onRestoreMocks={async () => {
+                  const configRef = doc(db, 'system', 'config');
+                  await setDoc(configRef, { deleted_mocks: [] }, { merge: true });
+                }}
+                onDeleteBlinkit={handleDeleteBlinkit}
+                onDeleteBuddy={handleDeleteBuddy}
+                onResolveQuery={handleResolveQuery}
+                onDeleteUser={handleDeleteUser}
+              />
+            );
+          default:
+            return null;
+        }
+      })()}
       
       <PostModal 
         isOpen={isPostModalOpen} 

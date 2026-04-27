@@ -136,42 +136,46 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-6xl mx-auto pt-12 pb-32 px-6 lg:px-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
         <div>
-          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">Find a Buddy</h2>
-          <p className="text-slate-500 text-sm font-medium">Don't go alone. Find your partner for anything.</p>
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-ramos-red" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-red">Network Discovery</span>
+          </div>
+          <h2 className="text-6xl font-bold text-ramos-black tracking-tighter leading-none mb-6">Buddy Finder</h2>
+          <p className="text-ramos-black/40 text-sm font-bold uppercase tracking-widest leading-loose">Establish connections within the campus network for shared activities.</p>
         </div>
         <button 
           onClick={() => setIsPosting(true)}
-          className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-orange-500 text-white font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-500/20"
+          className="flex items-center space-x-4 px-10 py-5 rounded-[28px] bg-ramos-black text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-ramos-red hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-ramos-black/20 group"
         >
-          <Plus className="w-5 h-5" />
-          <span>POST REQUEST</span>
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+          <span>New Engagement</span>
         </button>
       </div>
 
       {/* Category Filter */}
-      <div className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
+      <div className="flex space-x-4 mb-16 overflow-x-auto pb-6 no-scrollbar">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id as any)}
             className={cn(
-              "flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all",
+              "flex items-center space-x-3 px-8 py-4 rounded-[24px] font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all border",
               activeCategory === cat.id 
-                ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20" 
-                : "bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
+                ? "bg-ramos-black text-white border-ramos-black shadow-2xl shadow-ramos-black/20 scale-105" 
+                : "bg-white text-ramos-black/40 hover:text-ramos-black hover:bg-ramos-gray border-ramos-black/5"
             )}
           >
-            <cat.icon className="w-4 h-4" />
+            <cat.icon className={cn("w-4 h-4", activeCategory === cat.id ? "text-ramos-red" : "")} />
             <span>{cat.label}</span>
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AnimatePresence>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <AnimatePresence mode="popLayout">
           {filteredPosts.length > 0 ? filteredPosts.map((post) => {
             return (
               <BuddyCard
@@ -189,15 +193,15 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
             );
           }) : (
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="col-span-full py-20 flex flex-col items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[40px] text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="col-span-full py-32 flex flex-col items-center justify-center bg-ramos-gray/30 border border-dashed border-ramos-black/5 rounded-[56px] text-center"
             >
-              <div className="p-6 rounded-full bg-slate-100 text-slate-300 mb-4">
-                <Users className="w-12 h-12" />
+              <div className="w-24 h-24 rounded-[36px] bg-white border border-ramos-black/5 flex items-center justify-center text-ramos-black/10 mb-8 shadow-2xl shadow-ramos-black/5">
+                <Users className="w-10 h-10" />
               </div>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No buddy requests found</p>
-              <p className="text-slate-300 text-[10px] mt-2">Try posting one or switching categories!</p>
+              <p className="text-ramos-black/20 font-black uppercase tracking-[0.3em] text-[10px]">No active engagements found</p>
+              <p className="text-ramos-black/10 text-[9px] font-bold uppercase tracking-widest mt-4">Initiate a new request to establish network connectivity.</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -206,176 +210,168 @@ const BuddyFinder: React.FC<BuddyFinderProps> = ({
       {/* Post Modal */}
       <AnimatePresence>
         {isPosting && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsPosting(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-ramos-black/40 backdrop-blur-md"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg bg-white border border-slate-200 rounded-[40px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+              className="relative w-full max-w-2xl bg-white border border-ramos-black/5 rounded-[56px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
             >
-              <div className="p-8 border-b border-slate-50 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-slate-900 tracking-tighter">Find Your Buddy</h3>
+              <div className="p-10 border-b border-ramos-black/5 flex items-center justify-between bg-ramos-gray/10">
+                <div>
+                   <h3 className="text-3xl font-bold text-ramos-black tracking-tight mb-1">Establish Engagement</h3>
+                   <p className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.2em]">Institutional Connection Protocol</p>
+                </div>
                 <button 
                   onClick={() => setIsPosting(false)}
-                  className="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+                  className="p-4 rounded-3xl bg-white border border-ramos-black/5 text-ramos-black/20 hover:text-ramos-red hover:bg-ramos-red/5 transition-all active:scale-95 shadow-xl shadow-ramos-black/5"
                 >
                   <Plus className="w-6 h-6 rotate-45" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+              <div className="flex-1 overflow-y-auto p-12 no-scrollbar space-y-12">
                 <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Category</label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Engagement Category</label>
+                  <div className="grid grid-cols-3 gap-4">
                     {categories.filter(c => c.id !== 'all').map((cat) => (
                       <button
                         key={cat.id}
                         onClick={() => setNewCat(cat.id as any)}
                         className={cn(
-                          "flex flex-col items-center justify-center p-4 rounded-2xl border transition-all",
+                          "flex flex-col items-center justify-center p-6 rounded-[32px] border transition-all group",
                           newCat === cat.id 
-                            ? "bg-orange-50 border-orange-500 text-orange-600" 
-                            : "bg-slate-50 border-slate-100 text-slate-400 hover:bg-slate-100"
+                            ? "bg-ramos-black border-ramos-black text-white shadow-2xl shadow-ramos-black/20" 
+                            : "bg-ramos-gray border-transparent text-ramos-black/20 hover:bg-ramos-black/5"
                         )}
                       >
-                        <cat.icon className="w-5 h-5 mb-2" />
-                        <span className="text-[10px] font-bold uppercase">{cat.label}</span>
+                        <cat.icon className={cn("w-6 h-6 mb-3 transition-transform group-hover:scale-110", newCat === cat.id ? "text-ramos-red" : "")} />
+                        <span className="text-[9px] font-black uppercase tracking-widest">{cat.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                    <span>Title</span>
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Engagement Objective</label>
                   <input 
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="e.g. Looking for a Gym Partner"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none"
+                    placeholder="Brief description of activity..."
+                    className="w-full bg-ramos-gray border border-transparent rounded-[28px] py-6 px-10 text-ramos-black text-base font-bold focus:bg-white focus:border-ramos-red/20 outline-none transition-all"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                      <MapPin className="w-3 h-3 mr-2" />
-                      <span>Location</span>
-                    </label>
-                    <input 
-                      type="text"
-                      value={newLocation}
-                      onChange={(e) => setNewLocation(e.target.value)}
-                      placeholder="e.g. Gym A"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none text-sm"
-                    />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Location Reference</label>
+                    <div className="relative">
+                       <MapPin className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-ramos-black/20" />
+                       <input 
+                        type="text"
+                        value={newLocation}
+                        onChange={(e) => setNewLocation(e.target.value)}
+                        placeholder="Campus Venue"
+                        className="w-full bg-ramos-gray border border-transparent rounded-[24px] py-5 pl-16 pr-8 text-ramos-black text-sm font-bold focus:bg-white focus:border-ramos-red/20 outline-none transition-all"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                      <Calendar className="w-3 h-3 mr-2" />
-                      <span>Date</span>
-                    </label>
-                    <input 
-                      type="text"
-                      value={newDate}
-                      onChange={(e) => setNewDate(e.target.value)}
-                      placeholder="e.g. 5 PM Today"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors outline-none text-sm"
-                    />
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Engagement Time</label>
+                    <div className="relative">
+                       <Calendar className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-ramos-black/20" />
+                       <input 
+                        type="text"
+                        value={newDate}
+                        onChange={(e) => setNewDate(e.target.value)}
+                        placeholder="Scheduled Period"
+                        className="w-full bg-ramos-gray border border-transparent rounded-[24px] py-5 pl-16 pr-8 text-ramos-black text-sm font-bold focus:bg-white focus:border-ramos-red/20 outline-none transition-all"
+                      />
+                    </div>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                    <span>Description</span>
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <textarea 
-                    value={newDesc}
-                    onChange={(e) => setNewDesc(e.target.value)}
-                    placeholder="Tell them more about what you're looking for..."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 placeholder:text-slate-300 focus:border-orange-500 transition-colors min-h-[120px] resize-none outline-none"
-                  />
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
-                    <Clock className="w-3 h-3" />
-                    <span>How long is this valid?</span>
-                  </label>
-                  <div className="grid grid-cols-4 gap-3">
+                  <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Detailed Specifications</label>
+                  <textarea 
+                    value={newDesc}
+                    onChange={(e) => setNewDesc(e.target.value)}
+                    placeholder="Additional institutional requirements or notes..."
+                    className="w-full bg-ramos-gray border border-transparent rounded-[32px] py-8 px-10 text-ramos-black text-base font-bold focus:bg-white focus:border-ramos-red/20 outline-none min-h-[160px] resize-none transition-all"
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  <label className="text-[10px] font-black text-ramos-black/20 uppercase tracking-[0.3em] ml-6">Broadcast Validity Period</label>
+                  <div className="grid grid-cols-4 gap-4">
                     {[15, 30, 45, 60].map((min) => (
                       <button
                         key={min}
                         onClick={() => setNewWindow(min)}
                         className={cn(
-                          "py-3 rounded-2xl text-xs font-black transition-all",
+                          "py-5 rounded-[24px] text-[11px] font-black transition-all border",
                           newWindow === min 
-                            ? "bg-orange-500 text-white shadow-xl shadow-orange-500/20 scale-105" 
-                            : "bg-slate-50 text-slate-400 border border-slate-100 hover:bg-slate-100"
+                            ? "bg-ramos-black text-white border-ramos-black shadow-2xl shadow-ramos-black/20 scale-105" 
+                            : "bg-ramos-gray text-ramos-black/20 border-transparent hover:bg-ramos-black/5"
                         )}
                       >
-                        {min}m
+                        {min} MINS
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center justify-between p-8 bg-ramos-gray/40 rounded-[36px] border border-ramos-black/5">
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-900">Allow Direct Messages</span>
-                    <span className="text-[10px] text-slate-400">Let others message you directly</span>
+                    <span className="text-sm font-bold text-ramos-black tracking-tight">Establish Communication Channel</span>
+                    <span className="text-[10px] font-black text-ramos-black/30 uppercase tracking-widest mt-1">Enable direct network messaging</span>
                   </div>
                   <button 
                     onClick={() => setAllowDMs(!allowDMs)}
                     className={cn(
-                      "w-12 h-6 rounded-full transition-all relative",
-                      allowDMs ? "bg-orange-500" : "bg-slate-300"
+                      "w-16 h-8 rounded-full relative transition-all duration-500",
+                      allowDMs ? "bg-ramos-red shadow-xl shadow-ramos-red/20" : "bg-ramos-black/10"
                     )}
                   >
                     <div className={cn(
-                      "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
-                      allowDMs ? "left-7" : "left-1"
+                      "absolute top-1.5 w-5 h-5 bg-white rounded-full transition-all duration-500 shadow-2xl",
+                      allowDMs ? "left-9" : "left-1.5"
                     )} />
                   </button>
                 </div>
-                  </div>
-                </div>
+              </div>
 
-              <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                 <div className="hidden sm:flex items-center space-x-2 text-slate-300">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-nowrap">NexusCampus Sync</span>
+              <div className="p-10 bg-ramos-gray/10 border-t border-ramos-black/5 flex items-center justify-between">
+                 <div className="hidden sm:flex items-center space-x-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-black/20">System Ready</span>
                 </div>
-                <div className="flex space-x-3 w-full sm:w-auto">
+                <div className="flex space-x-4 w-full sm:w-auto">
                   <button 
                     onClick={() => setIsPosting(false)}
-                    className="flex-1 sm:flex-none px-6 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
+                    className="flex-1 sm:flex-none px-10 py-5 rounded-[24px] bg-white border border-ramos-black/5 text-ramos-black/40 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-ramos-black hover:text-white transition-all shadow-xl shadow-ramos-black/5 active:scale-95"
                   >
-                    CANCEL
+                    Discard
                   </button>
                   <button 
                     onClick={handleSubmit}
                     disabled={!newTitle.trim() || !newDesc.trim() || isSubmitting}
                     className={cn(
-                      "flex-1 sm:flex-none px-10 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center",
+                      "flex-1 sm:flex-none px-16 py-5 rounded-[24px] font-black text-[10px] uppercase tracking-[0.3em] transition-all flex items-center justify-center shadow-2xl active:scale-95",
                       (!newTitle.trim() || !newDesc.trim() || isSubmitting)
-                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                        : "bg-orange-500 text-white hover:bg-orange-600 shadow-xl shadow-orange-500/20"
+                        ? "bg-ramos-gray text-ramos-black/10 border border-ramos-black/5 cursor-not-allowed"
+                        : "bg-ramos-black text-white hover:bg-ramos-red shadow-ramos-black/20"
                     )}
                   >
-                    {isSubmitting ? <span className="animate-pulse px-2">POSTING...</span> : "POST NOW"}
+                    {isSubmitting ? <span className="animate-pulse px-2">Broadcasting...</span> : "Establish"}
                   </button>
                 </div>
               </div>

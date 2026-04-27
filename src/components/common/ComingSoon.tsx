@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Clock, Hexagon } from 'lucide-react';
+import { Zap, Clock, Hexagon } from 'lucide-react';
 
 interface ComingSoonProps {
   title: string;
@@ -70,9 +70,9 @@ const ComingSoon: React.FC<ComingSoonProps> = ({ title, description }) => {
         </div>
         
         <div className="mt-12 flex items-center justify-center space-x-2 text-slate-400">
-          <Sparkles className="w-4 h-4" />
+          <Zap className="w-4 h-4" />
           <span className="text-xs font-bold uppercase tracking-widest">Stay Tuned</span>
-          <Sparkles className="w-4 h-4" />
+          <Zap className="w-4 h-4" />
         </div>
       </motion.div>
     </div>

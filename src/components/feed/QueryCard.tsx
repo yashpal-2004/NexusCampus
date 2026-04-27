@@ -48,11 +48,11 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="bg-white border border-slate-200 rounded-3xl p-5 mb-4 hover:border-orange-200 transition-all group shadow-sm"
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="bg-white border border-ramos-gray rounded-[32px] p-8 mb-6 hover:shadow-xl hover:shadow-ramos-black/5 transition-all duration-500 group relative overflow-hidden"
     >
-      <div className="flex items-start space-x-4">
-        <div className="w-12 h-12 rounded-full bg-slate-100 flex-shrink-0 flex items-center justify-center text-slate-600 font-bold text-lg overflow-hidden border border-slate-200">
+      <div className="flex items-start space-x-6">
+        <div className="w-14 h-14 rounded-2xl bg-ramos-gray flex-shrink-0 flex items-center justify-center text-ramos-black font-bold text-xl overflow-hidden border border-ramos-black/5">
           {query.authorPhoto ? (
             <img src={query.authorPhoto} alt={query.authorName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           ) : (
@@ -61,42 +61,43 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
         </div>
         
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center space-x-2">
-              <span className="font-bold text-slate-900 text-sm">{query.authorName}</span>
-              <span className="text-slate-400 text-xs">•</span>
-              <span className="text-slate-400 text-xs">{formatDistanceToNow(ensureMillis(query.createdAt))} ago</span>
-              {query.status === 'resolved' && (
-                <span className="flex items-center space-x-1 px-2 py-0.5 bg-green-50 text-green-700 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-green-100">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Resolved</span>
-                </span>
-              )}
-              {query.status === 'pending' && (
-                <span className="flex items-center space-x-1 px-2 py-0.5 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-amber-100">
-                  <Clock className="w-3 h-3" />
-                  <span>Pending</span>
-                </span>
-              )}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <span className="font-bold text-ramos-black text-base tracking-tight">{query.authorName}</span>
+              <span className="text-ramos-black/20 text-xs">•</span>
+              <span className="text-ramos-black/40 text-[10px] font-bold uppercase tracking-widest">{formatDistanceToNow(ensureMillis(query.createdAt))} ago</span>
+              
+              <AnimatePresence>
+                {query.status === 'resolved' && (
+                  <motion.span 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center space-x-1.5 px-3 py-1 bg-green-50 text-green-600 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border border-green-100"
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Resolved</span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </div>
-            <div className="flex items-center space-x-2 relative">
+            
+            <div className="flex items-center space-x-2">
               {onDelete && (
                 <button 
                   onClick={() => onDelete(query.id)}
-                  className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider hover:bg-red-100 transition-all border border-red-100"
-                  title="Delete Query"
+                  className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-ramos-red/5 text-ramos-red text-[10px] font-black uppercase tracking-widest hover:bg-ramos-red hover:text-white transition-all border border-ramos-red/10"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete</span>
+                  <span>Remove</span>
                 </button>
               )}
               
-              <div className="relative group/menu">
+              <div className="relative">
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className={cn(
-                    "p-2 rounded-xl transition-all",
-                    isMenuOpen ? "bg-slate-100 text-slate-900" : "text-slate-300 hover:text-slate-600 hover:bg-slate-50"
+                    "p-2.5 rounded-xl transition-all",
+                    isMenuOpen ? "bg-ramos-gray text-ramos-black" : "text-ramos-black/20 hover:text-ramos-black hover:bg-ramos-gray"
                   )}
                 >
                   <MoreHorizontal className="w-5 h-5" />
@@ -105,25 +106,19 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
                 <AnimatePresence>
                   {isMenuOpen && (
                     <>
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setIsMenuOpen(false)} 
-                      />
+                      <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)} />
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                        className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-50 overflow-hidden py-1"
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="absolute right-0 top-full mt-2 w-56 bg-white border border-ramos-gray rounded-[24px] shadow-2xl z-50 overflow-hidden p-2"
                       >
                         <button 
-                          onClick={() => {
-                            setIsHidden(true);
-                            setIsMenuOpen(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[10px] font-black text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all uppercase tracking-[0.2em]"
+                          onClick={() => { setIsHidden(true); setIsMenuOpen(false); }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[10px] font-black text-ramos-black/40 hover:bg-ramos-gray hover:text-ramos-black transition-all uppercase tracking-[0.2em] rounded-xl"
                         >
-                          <EyeOff className="w-4 h-4 text-orange-500" />
-                          <span>Hide for now</span>
+                          <EyeOff className="w-4 h-4 text-ramos-red" />
+                          <span>Hide Post</span>
                         </button>
                       </motion.div>
                     </>
@@ -133,57 +128,50 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
             </div>
           </div>
           
-          <p className="text-slate-700 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
+          <p className="text-ramos-black/70 text-lg font-medium leading-relaxed mb-6 whitespace-pre-wrap tracking-tight">
             {query.content}
           </p>
           
           {query.imageUrl && (
-            <div className="rounded-2xl overflow-hidden border border-slate-100 mb-4">
+            <div className="rounded-[24px] overflow-hidden border border-ramos-gray mb-6 shadow-sm">
               <img 
                 src={query.imageUrl} 
                 alt="Query attachment" 
-                className="w-full h-auto object-cover max-h-96"
+                className="w-full h-auto object-cover max-h-[500px]"
                 referrerPolicy="no-referrer"
               />
             </div>
           )}
           
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-1 bg-slate-50 rounded-full p-1 border border-slate-100">
+          <div className="flex items-center justify-between pt-4 border-t border-ramos-gray">
+            <div className="flex items-center space-x-2 bg-ramos-gray rounded-full p-1 border border-ramos-black/5">
               <button 
                 onClick={() => onUpvote(query.id)}
                 className={cn(
-                  "p-1.5 rounded-full transition-all",
-                  hasUpvoted ? "bg-orange-500 text-white shadow-md" : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  "p-2.5 rounded-full transition-all",
+                  hasUpvoted ? "bg-ramos-red text-white shadow-lg shadow-ramos-red/20" : "text-ramos-black/20 hover:text-ramos-black hover:bg-white"
                 )}
               >
                 <ArrowBigUp className={cn("w-5 h-5", hasUpvoted ? "fill-current" : "")} />
               </button>
               <span className={cn(
-                "text-xs font-bold px-2 min-w-[2ch] text-center",
-                voteCount > 0 ? "text-orange-600" : "text-slate-400"
+                "text-xs font-black px-3 min-w-[3ch] text-center",
+                voteCount > 0 ? "text-ramos-black" : "text-ramos-black/20"
               )}>
                 {voteCount}
               </span>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => setIsReplying(!isReplying)}
-                className={cn(
-                  "flex items-center space-x-1.5 transition-colors group/btn",
-                  isReplying ? "text-orange-600" : "text-slate-400 hover:text-slate-600"
-                )}
-              >
-                <div className={cn(
-                  "p-2 rounded-full transition-colors",
-                  isReplying ? "bg-orange-50" : "group-hover/btn:bg-orange-50"
-                )}>
-                  <MessageCircle className="w-4 h-4" />
-                </div>
-                <span className="text-xs font-medium">{query.replies?.length || 0} Replies</span>
-              </button>
-            </div>
+            <button 
+              onClick={() => setIsReplying(!isReplying)}
+              className={cn(
+                "flex items-center space-x-2 px-6 py-3 rounded-full transition-all text-[10px] font-black uppercase tracking-widest",
+                isReplying ? "bg-ramos-black text-white" : "bg-ramos-gray text-ramos-black/40 hover:text-ramos-black hover:bg-ramos-gray"
+              )}
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{query.replies?.length || 0} Responses</span>
+            </button>
           </div>
 
           <AnimatePresence>
@@ -192,26 +180,26 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-slate-100 space-y-4"
+                className="mt-6 pt-6 space-y-6"
               >
                 {/* Replies List */}
                 {query.replies && query.replies.length > 0 && (
-                  <div className="space-y-4 mb-4">
+                  <div className="space-y-4">
                     {query.replies.map((reply) => (
-                      <div key={reply.id} className="flex items-start space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-600 overflow-hidden border border-slate-200">
+                      <div key={reply.id} className="flex items-start space-x-4">
+                        <div className="w-10 h-10 rounded-xl bg-ramos-gray flex-shrink-0 flex items-center justify-center text-xs font-bold text-ramos-black overflow-hidden border border-ramos-black/5">
                           {reply.authorPhoto ? (
                             <img src={reply.authorPhoto} alt={reply.authorName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
                             reply.authorName[0]
                           )}
                         </div>
-                        <div className="flex-1 bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-bold text-slate-900">{reply.authorName}</span>
-                            <span className="text-[8px] text-slate-400">{formatDistanceToNow(ensureMillis(reply.createdAt))} ago</span>
+                        <div className="flex-1 bg-ramos-gray/30 rounded-2xl p-4 border border-ramos-gray">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] font-black text-ramos-black uppercase tracking-wider">{reply.authorName}</span>
+                            <span className="text-[9px] font-bold text-ramos-black/20">{formatDistanceToNow(ensureMillis(reply.createdAt))} ago</span>
                           </div>
-                          <p className="text-xs text-slate-600 leading-relaxed">{reply.content}</p>
+                          <p className="text-sm text-ramos-black/60 font-medium leading-relaxed">{reply.content}</p>
                         </div>
                       </div>
                     ))}
@@ -219,20 +207,22 @@ const QueryCard: React.FC<QueryCardProps> = ({ query, onUpvote, onReply, onDelet
                 )}
 
                 {/* Reply Input */}
-                <div className="flex items-center space-x-2">
-                  <input 
-                    type="text"
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="Write a reply..."
-                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl py-2 px-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-orange-500 transition-colors outline-none"
-                  />
+                <div className="flex items-center space-x-3 pt-4">
+                  <div className="flex-1 relative">
+                    <input 
+                      type="text"
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder="Contribute to the intelligence hub..."
+                      className="w-full bg-ramos-gray border border-transparent rounded-2xl py-4 px-6 text-sm text-ramos-black placeholder:text-ramos-black/20 focus:bg-white focus:border-ramos-red/20 transition-all outline-none font-medium"
+                    />
+                  </div>
                   <button 
                     onClick={handleReplySubmit}
                     disabled={!replyContent.trim()}
-                    className="p-2 rounded-xl bg-orange-500 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-orange-600 transition-colors shadow-md shadow-orange-500/10"
+                    className="p-4 rounded-2xl bg-ramos-red text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-ramos-red/90 transition-all shadow-xl shadow-ramos-red/20 active:scale-95"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-5 h-5" />
                   </button>
                 </div>
               </motion.div>

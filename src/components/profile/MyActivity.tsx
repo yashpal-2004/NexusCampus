@@ -16,6 +16,8 @@ interface MyActivityProps {
   onExtendBlinkit?: (id: string, mins: number) => void;
   onExtendBuddy?: (id: string, mins: number) => void;
   onDeleteBlinkit?: (id: string) => void;
+  onLeaveBlinkit?: (id: string) => void;
+  onCloseBlinkit?: (id: string) => void;
   currentUserId: string;
   allUsers: UserProfile[];
 }
@@ -29,71 +31,80 @@ const MyActivity: React.FC<MyActivityProps> = ({
   onExtendBlinkit,
   onExtendBuddy,
   onDeleteBlinkit,
+  onLeaveBlinkit,
+  onCloseBlinkit,
   currentUserId,
   allUsers
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'queries' | 'blinkit' | 'buddy'>('queries');
 
   return (
-    <div className="max-w-4xl mx-auto pt-8 pb-24 px-4">
-      <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="max-w-4xl mx-auto pt-12 pb-32 px-6">
+      <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10">
         <div>
-          <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2 italic uppercase">My Activity</h2>
-          <p className="text-slate-500 text-sm font-medium">History of your campus contributions.</p>
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-ramos-red" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-red">My Activity</span>
+          </div>
+          <h2 className="text-6xl font-bold text-ramos-black tracking-tighter leading-none mb-4">Dashboard</h2>
+          <p className="text-ramos-black/40 text-sm font-bold uppercase tracking-widest">Manage your contributions</p>
         </div>
 
-        <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+        <div className="flex bg-ramos-gray p-1.5 rounded-[24px] border border-ramos-black/5">
           <button
             onClick={() => setActiveSubTab('queries')}
             className={cn(
-              "flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all",
-              activeSubTab === 'queries' ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600"
+              "flex items-center space-x-3 px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em]",
+              activeSubTab === 'queries' ? "bg-white text-ramos-black shadow-xl shadow-ramos-black/5" : "text-ramos-black/20 hover:text-ramos-black"
             )}
           >
             <MessageSquare className="w-4 h-4" />
-            <span className="uppercase tracking-widest">Queries</span>
+            <span>Queries</span>
           </button>
           <button
             onClick={() => setActiveSubTab('blinkit')}
             className={cn(
-              "flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all",
-              activeSubTab === 'blinkit' ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600"
+              "flex items-center space-x-3 px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em]",
+              activeSubTab === 'blinkit' ? "bg-white text-ramos-black shadow-xl shadow-ramos-black/5" : "text-ramos-black/20 hover:text-ramos-black"
             )}
           >
             <ShoppingBag className="w-4 h-4" />
-            <span className="uppercase tracking-widest">Orders</span>
+            <span>Orders</span>
           </button>
           <button
             onClick={() => setActiveSubTab('buddy')}
             className={cn(
-              "flex items-center space-x-2 px-6 py-2.5 rounded-xl text-xs font-black transition-all",
-              activeSubTab === 'buddy' ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600"
+              "flex items-center space-x-3 px-8 py-3.5 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em]",
+              activeSubTab === 'buddy' ? "bg-white text-ramos-black shadow-xl shadow-ramos-black/5" : "text-ramos-black/20 hover:text-ramos-black"
             )}
           >
             <Users className="w-4 h-4" />
-            <span className="uppercase tracking-widest">Buddies</span>
+            <span>Buddies</span>
           </button>
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-12">
         <AnimatePresence mode="wait">
           {activeSubTab === 'queries' && (
             <motion.div
               key="queries"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="space-y-8"
             >
               {userQueries.length === 0 ? (
-                <div className="p-16 rounded-[40px] border-2 border-dashed border-slate-200 text-center space-y-4 text-slate-400">
-                  <MessageSquare className="w-12 h-12 mx-auto opacity-20" />
-                  <p className="text-sm font-black uppercase tracking-widest opacity-40">No queries posted yet</p>
+                <div className="p-24 rounded-[48px] border-2 border-dashed border-ramos-gray text-center space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-ramos-gray flex items-center justify-center mx-auto">
+                    <MessageSquare className="w-10 h-10 text-ramos-black/10" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-black/20">Intelligence Hub Empty</p>
                 </div>
               ) : (
                 userQueries.map((query) => (
-                  <div key={query.id} className="relative">
+                  <div key={query.id} className="relative group">
                     <QueryCard 
                       query={query} 
                       onUpvote={() => {}} 
@@ -103,10 +114,10 @@ const MyActivity: React.FC<MyActivityProps> = ({
                     {query.status !== 'resolved' && (
                       <button
                         onClick={() => onResolve(query.id)}
-                        className="absolute top-4 right-4 flex items-center space-x-2 px-4 py-2 rounded-xl bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500/60 hover:text-white transition-all z-10"
+                        className="absolute top-8 right-32 flex items-center space-x-2 px-6 py-3 rounded-2xl bg-green-500 text-white shadow-xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all z-10 text-[10px] font-black uppercase tracking-widest"
                       >
                         <CheckCircle className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Resolve</span>
+                        <span>Resolve Post</span>
                       </button>
                     )}
                   </div>
@@ -118,15 +129,18 @@ const MyActivity: React.FC<MyActivityProps> = ({
           {activeSubTab === 'blinkit' && (
             <motion.div
               key="blinkit"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="space-y-8"
             >
               {expiredBlinkitRequests.length === 0 ? (
-                <div className="p-16 rounded-[40px] border-2 border-dashed border-slate-200 text-center space-y-4 text-slate-400">
-                  <ShoppingBag className="w-12 h-12 mx-auto opacity-20" />
-                  <p className="text-sm font-black uppercase tracking-widest opacity-40">No order history found</p>
+                <div className="p-24 rounded-[48px] border-2 border-dashed border-ramos-gray text-center space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-ramos-gray flex items-center justify-center mx-auto">
+                    <ShoppingBag className="w-10 h-10 text-ramos-black/10" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-black/20">No orders found</p>
                 </div>
               ) : (
                 expiredBlinkitRequests.map((req) => (
@@ -134,6 +148,8 @@ const MyActivity: React.FC<MyActivityProps> = ({
                     key={req.id} 
                     request={req} 
                     onJoin={() => {}} 
+                    onLeave={onLeaveBlinkit}
+                    onClose={onCloseBlinkit}
                     onExtend={onExtendBlinkit}
                     onDelete={onDeleteBlinkit}
                     currentUserId={currentUserId}
@@ -147,15 +163,18 @@ const MyActivity: React.FC<MyActivityProps> = ({
           {activeSubTab === 'buddy' && (
             <motion.div
               key="buddy"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="space-y-8"
             >
               {expiredBuddyRequests.length === 0 ? (
-                <div className="p-16 rounded-[40px] border-2 border-dashed border-slate-200 text-center space-y-4 text-slate-400">
-                  <Users className="w-12 h-12 mx-auto opacity-20" />
-                  <p className="text-sm font-black uppercase tracking-widest opacity-40">No buddy history found</p>
+                <div className="p-24 rounded-[48px] border-2 border-dashed border-ramos-gray text-center space-y-6">
+                  <div className="w-20 h-20 rounded-3xl bg-ramos-gray flex items-center justify-center mx-auto">
+                    <Users className="w-10 h-10 text-ramos-black/10" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-ramos-black/20">Network History Clear</p>
                 </div>
               ) : (
                 expiredBuddyRequests.map((post) => (
